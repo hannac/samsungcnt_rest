@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 로컬 개발용 DTD 선언 : 운영 소스에서는 로컬용에 주석하고 사용 -->
+<!DOCTYPE mapper SYSTEM "../../../../mybatis-3-mapper.dtd" >
+
+<!-- AWS 운영용 DTD 선언 : 운영 소스에 업로드 전에 위의 로컬용 SYSTEM DTD 는 주석처리, 아래 PUBLIC DTD 주석 풀어서 업로드 해야 함 -->
+<!-- !DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd"-->
+  
+<mapper namespace="com.ryu.bigdata.mapper.ProductMapper">
+
+	<!-- product 테이블과 Product 모델 클래스 속성명 불일치에 따라 테이블 컬럼과 모델 클래스 매핑하는 resultMap 설정 -->
+	<resultMap type="com.ryu.bigdata.vo.Product" id="productMap">
+		<id     column="product_id"     property="productId"/>
+		<result column="product_cd"     property="productCd"/>
+		<result column="acc_sales"      property="accSales"/>
+		<result column="brand_nm"       property="brandNm"/>
+		<result column="release_dt"     property="releaseDt"/>
+		<result column="retail_price"   property="retailPrice"/>
+		<result column="end_dt"         property="endOfLife"/>
+		<result column="product_nm"     property="productNm"/>
+		<result column="item"           property="item"/>
+		<result column="color"          property="color"/>
+		<result column="season"         property="season"/>
+		<result column="size"           property="size"/>
+		<result column="fabric"         property="fabric"/>
+		<result column="img_url_01"     property="imageUrl"/>
+		<result column="crawl_url"      property="crawlUrl"/>
+		<result column="own_product_yn" property="ownProductYn"/>
+		<result column="file_nm" 		property="fileNm"/>
+	</resultMap>
+	
+	<resultMap type="com.ryu.bigdata.vo.WeeklySales" id="WeeklySalesMap">
+		<id     column="week"     property="week"/>
+		<result column="sales"     property="sales"/>
+	</resultMap>
+
+	<select id="selectCount" resultType="int">
+		SELECT count(*) cnt
+		  FROM product 
+	</select>
+	
+	<select id="selectMaxID" resultType="int">
+		SELECT MAX(product_id) AS ProductId
+		  FROM product
+	</select>
+	
+	<!-- resultType 대신 resultMap 으로 결과셋 처리하고 productMap 으로 받도록 설정 -->
+	<select id="selectProductInfo" parameterType="long" resultMap="productMap">
+		SELECT product_id
+		     , product_cd
+		     , acc_sales
+		     , brand_nm
+		     , DATE_FORMAT(release_dt,'%Y%m%d') AS release_dt
+		     , retail_price
+		     , DATE_FORMAT(end_dt,'%Y%m%d') AS end_dt
+		     , product_nm
+		     , item
+		     , color
+		     , season
+		     , size
+		     , fabric
+		     , img_url_01
+		     , crawl_url
+		     , own_product_yn
+		     , file_nm
+		 FROM product 
+		WHERE product_id = #{value}
+		LIMIT 1
+	</select>
+	
+	<!-- resultType 대신 resultMap 으로 결과셋 처리하고 productMap 으로 받도록 설정 -->
+	<select id="selectProductInfoByImg" parameterType="String" resultMap="productMap">
+		SELECT product_id
+		     , product_cd
+		     , acc_sales
+		     , brand_nm
+		     , DATE_FORMAT(release_dt,'%Y%m%d') AS release_dt
+		     , retail_price
+		     , DATE_FORMAT(end_dt,'%Y%m%d') AS end_dt
+		     , product_nm
+		     , item
+		     , color
+		     , season
+		     , size
+		     , fabric
+		     , img_url_01
+		     , crawl_url
+		     , own_product_yn
+		     , file_nm
+		 FROM product 
+		WHERE file_nm = #{value}
+		<!-- WHERE img_url_01 LIKE CONCAT('%',#{value},'%') -->
+		  AND own_product_yn = 'N'
+		LIMIT 1
+	</select>
+	
+	<select id="selectWeeklyInfo" parameterType="com.ryu.bigdata.vo.WeeklySalesSearch" resultMap="WeeklySalesMap">
+        SELECT CONCAT(years, '_', weeks) AS week
+			 , sales_cnt AS sales
+		  FROM sale_weekly
+		 WHERE product_id = #{productId}
+           AND years BETWEEN #{startYear} AND #{endYear}
+           AND weeks BETWEEN #{startWeek} AND #{endWeek}
+	</select>
+	
+	
+	
+	<!-- 시연용 -->
+	<select id="selectProductInfoByProductCD" parameterType="String" resultMap="productMap">
+		SELECT product_id
+		     , product_cd
+		     , acc_sales
+		     , brand_nm
+		     , DATE_FORMAT(release_dt,'%Y%m%d') AS release_dt
+		     , retail_price
+		     , DATE_FORMAT(end_dt,'%Y%m%d') AS end_dt
+		     , product_nm
+		     , item
+		     , color
+		     , season
+		     , size
+		     , fabric
+		     , img_url_01
+		     , crawl_url
+		     , own_product_yn
+		     , file_nm
+		 FROM product 
+		WHERE product_cd = #{value}
+		  AND own_product_yn = 'Y'
+		LIMIT 1
+	</select>
+	
+	<insert id="insertProductInfo" parameterType="com.ryu.bigdata.vo.Product">
+		Insert Into product(product_cd, img_url_01, own_product_yn, reg_date, file_nm) 
+		values(#{productCd}, #{imageUrl}, #{ownProductYn}, now(), #{fileNm})
+	</insert>
+	
+	<insert id="insertProductDetailInfo" parameterType="com.ryu.bigdata.vo.Product">
+		Insert Into product(product_cd, acc_sales, brand_nm, release_dt, retail_price, end_dt, 
+			product_nm, item, color, season, size, fabric, img_url_01, crawl_url, own_product_yn,
+			file_nm)
+		values(#{productCd}, #{accSales}, #{brandNm}, #{releaseDt}, #{retailPrice}, #{endOfLife}, 
+			#{productNm}, #{item}, #{color}, #{season}, #{size}, #{fabric}, #{imageUrl}, #{crawlUrl} ,
+			#{ownProductYn}, #{fileNm})
+	</insert>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
