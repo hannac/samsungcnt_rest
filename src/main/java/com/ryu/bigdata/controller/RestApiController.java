@@ -1337,12 +1337,12 @@ public class RestApiController {
 
 	@ApiOperation(value = "벡터 변환 대상 이미지 검색")
 	@GetMapping("/skuImg/vector")
-	public Map vectorYnSearch(@RequestParam VectorConvertitsRequestDto vectorConvertitsRequestDto) {
+	public Map vectorYnSearch(VectorConvertitsRequestDto vectorConvertitsRequestDto) {
 		return vectorService.selectVectorNoList(vectorConvertitsRequestDto);
 	}
 
 	@ApiOperation(value = "벡터 저장")
-	@GetMapping("/vector/upsert")
+	@PostMapping("/vector/upsert")
 	public Map vectorUpsert(@RequestBody VectorUpsertRequestDto vectorUpsertRequestDto) {
 		return vectorService.upsertVector(vectorUpsertRequestDto);
 	}

@@ -2,6 +2,7 @@ package com.ryu.bigdata.mapper;
 
 import com.ryu.bigdata.vo.SkuImgVo;
 import org.mapstruct.Mapper;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,5 +15,6 @@ public interface VectorMapper {
 	 * @return
 	 */
 	List<SkuImgVo> selectVectorNoList(SkuImgVo skuImgVo);
+
 	int updateVector(SkuImgVo skuImgVo);
 }

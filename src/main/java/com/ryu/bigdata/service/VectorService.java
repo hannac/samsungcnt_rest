@@ -1,13 +1,13 @@
 package com.ryu.bigdata.service;
 
 import com.ryu.bigdata.dto.requestDto.VectorConvertitsRequestDto;
+import com.ryu.bigdata.dto.requestDto.VectorItem;
 import com.ryu.bigdata.dto.requestDto.VectorUpsertRequestDto;
 import com.ryu.bigdata.dto.responseDto.CommonResult;
 import com.ryu.bigdata.mapper.VectorMapper;
 import com.ryu.bigdata.vo.SkuImgVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,22 +22,14 @@ public class VectorService {
     public Map<String, Object> selectVectorNoList(VectorConvertitsRequestDto vectorConvertitsRequestDto) {
 
         Map resultMap = new HashMap();
-//        Stream<VectorConvertitsResponseDto> vectorConvertitsResponseDtoStream = Stream.of(
-//                new VectorConvertitsResponseDto(1, 1,"http://s3path"),
-//                new VectorConvertitsResponseDto(2, 1,"http://s3path"),
-//                new VectorConvertitsResponseDto(3, 1,"http://s3path"),
-//                new VectorConvertitsResponseDto(4, 1,"http://s3path")
-//        );
-//        List resultList = vectorConvertitsResponseDtoStream.collect(Collectors.toList());
         SkuImgVo skuImgVo = new SkuImgVo();
-        skuImgVo.setRegDateItem(vectorConvertitsRequestDto.getRegDateTime());
-        List resultList = vectorMapper.selectVectorNoList(skuImgVo);
+        skuImgVo.setRegDateTime(vectorConvertitsRequestDto.getRegDateTime());
+        List<SkuImgVo> resultList = vectorMapper.selectVectorNoList(skuImgVo);
         resultMap.put("data", resultList);
         resultMap.put("result", new CommonResult());
         return resultMap;
     }
 
-    @Transactional
     public Map<String, Object> upsertVector(VectorUpsertRequestDto vectorUpsertRequestDto) {
 
         Map resultMap = new HashMap();
@@ -45,8 +37,8 @@ public class VectorService {
 
             if (vectorUpsertRequestDto.getBulkYn().equals("Y")) {
                 // 멀티 저장
-                List<VectorUpsertRequestDto.VectorItem> list = vectorUpsertRequestDto.getVectorItems();
-                for (VectorUpsertRequestDto.VectorItem item : list) {
+                List<VectorItem> list = vectorUpsertRequestDto.getList();
+                for (VectorItem item : list) {
                     SkuImgVo skuImgVo = new SkuImgVo();
                     skuImgVo.setSkuId(item.getSkuId());
                     skuImgVo.setSkuImgId(item.getSkuImgId());
@@ -56,7 +48,7 @@ public class VectorService {
                 // 쿼리 호출
             } else {
                 // 싱글 저장
-                VectorUpsertRequestDto.VectorItem vectorItem = vectorUpsertRequestDto.getVectorItem();
+                VectorItem vectorItem = vectorUpsertRequestDto.getOne();
                 // 쿼리 호출
                 SkuImgVo skuImgVo = new SkuImgVo();
                 skuImgVo.setSkuId(vectorItem.getSkuId());

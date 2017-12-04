@@ -11,17 +11,18 @@
 	<!-- resultType 대신 resultMap 으로 결과셋 처리하고 productMap 으로 받도록 설정 -->
 	<select id="selectVectorNoList" parameterType="com.ryu.bigdata.vo.SkuImgVo" resultType="com.ryu.bigdata.vo.SkuImgVo">
 
-		SELECT VECTOR FROM SKU_IMG
+		SELECT  SKU_IMG_ID as skuImgId, SKU_ID as skuId, S3_PATH as s3Path
+		FROM bigdata.SKU_IMG
 		WHERE 1 = 1
 		AND VECTOR_YN = 'N'
 		<if test="regDateTime != null">
-			AND DATE_FORMAT(REG_DATE_TIME, '%Y-%M-%D') LIKE #{regDateTime}
+			AND DATE_FORMAT(REG_DATE_TIME, '%Y-%m-%d') LIKE #{regDateTime}
 		</if>
 
 	</select>
 
 	<update id="updateVector" parameterType="com.ryu.bigdata.vo.SkuImgVo">
-		UPDATE SKU_IMG SET VECTOR_YN = 'Y', VECTOR = #{vector} where SKU_ID = #{skuId} and SKU_IMG_ID = #{skuImgId}
+		UPDATE bigdata.SKU_IMG SET VECTOR_YN = 'Y', VECTOR = #{vector} where SKU_ID = #{skuId} and SKU_IMG_ID = #{skuImgId}
 	</update>
 	
 
