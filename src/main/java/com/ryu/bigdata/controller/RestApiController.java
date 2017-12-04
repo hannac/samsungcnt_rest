@@ -1334,7 +1334,6 @@ public class RestApiController {
 	@Autowired
 	VectorService vectorService;
 
-
 	@ApiOperation(value = "벡터 변환 대상 이미지 검색")
 	@GetMapping("/skuImg/vector")
 	public Map vectorYnSearch(VectorConvertitsRequestDto vectorConvertitsRequestDto) {
@@ -1364,9 +1363,6 @@ public class RestApiController {
 	public Map dailyInsert(@RequestBody DailyRequestDto dailyRequestDto) {
 		return dailyInfoService.insertDailyInfo(dailyRequestDto);
 	}
-
-
-
 
 
 }

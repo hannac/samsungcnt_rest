@@ -8,40 +8,170 @@
   
 <mapper namespace="com.ryu.bigdata.mapper.SkuBaseMapper">
 
-	<insert id="insertSku" parameterType="com.ryu.bigdata.vo.SkuImgVo">
+	<insert id="insertSku" parameterType="com.ryu.bigdata.dto.models.Sku">
 		INSERT INTO bigdata.SKU
 		(
 			GOODS_ID
 		  , COLOR_ID
-		  , SKU_CODE
 		  , SKU_NAME
-	  	  , EVAL_POINT_AVERAGE
-		  , ORIGIN, TAG_PRICE
+		  , ORIGIN
+		  , TAG_PRICE
 		  , DESCR
 		  , COLLECT_PATH
 		  , REG_DATE_TIME
-		  , UPDATE_DATE_TIME
 		  , REG_USER
-		  , UPDATE_USER
 		)
 		VALUES
 		(
-		      244700
-		    , null
-		    , '0000000096217'
-		    , '숄더백 J01MQ534D'
-	  	    , null
-			, '한국'
-			, 353000
-			, null
-			, 'http://department.ssg.com/item/itemView.ssg?itemId=0000000096217'
-			, null
-			, null
-			, null
-			, null
-		);
+		      #{skuId}
+		    , #{colorId}
+	  	    , #{skuName}
+			, #{origin}
+			, #{tagPrice}
+			, #{descr}
+			, #{collectPath}
+		    , now()
+			, 'REST_API_ADMIN'
+		)
 	</insert>
-	
+
+	<insert id="insertMaterial" parameterType="com.ryu.bigdata.dto.models.Material">
+		INSERT INTO bigdata.MATERIAL
+		(
+			  GOODS_ID
+			, MATERIAL_DIVISION
+			, MATERIAL_NAME
+			, RATE
+			, REG_DATE_TIME
+			, REG_USER
+		)
+		VALUES
+		(
+			  #{skuId}
+			, #{materialComposed}
+			, #{materialName}
+			, #{rate}
+		    , now()
+		    , 'REST_API_ADMIN'
+		)
+	</insert>
+	<insert id="insertGoodsSize" parameterType="com.ryu.bigdata.dto.models.GoodsSize">
+		INSERT INTO bigdata.SIZE
+		(
+		      SIZE_ID
+			, SKU_ID
+			, SIZE
+			, REG_DATE_TIME
+			, REG_USER
+		)
+		VALUES
+		(
+			  #{sizeId}
+			, #{skuId}
+			, #{size}
+			, now()
+			, 'REST_API_ADMIN'
+		)
+	</insert>
+	<insert id="insertGoodsImg" parameterType="com.ryu.bigdata.dto.models.GoodsImg">
+		INSERT INTO bigdata.SIZE
+		(
+			  GOOD_IMG_ID
+			, GOOD_ID
+			, S3_PATH
+			, THUMBNAIL_PATH
+			, REG_DATE_TIME
+			, REG_USER
+		)
+		VALUES
+		(
+			  #{goodsImgId}
+			, #{skuId}
+			, #{s3Path}
+			, #{thumbnailPath}
+			, now()
+			, 'REST_API_ADMIN'
+		)
+	</insert>
+	<insert id="insertBrand" parameterType="com.ryu.bigdata.dto.models.Brand">
+		INSERT INTO bigdata.BRAND
+		(
+			  BRAND_ID
+			, BRAND_NAME
+			, REG_DATE_TIME
+			, REG_USER
+		)
+		VALUES
+		(
+			  #{brandId}
+			, #{brandName}
+			, now()
+			, 'REST_API_ADMIN'
+		)
+	</insert>
+	<insert id="insertColor" parameterType="com.ryu.bigdata.dto.models.Color">
+		INSERT INTO bigdata.COLOR
+		(
+			  COLOR_ID
+			, COLOR_NAME
+			, REG_DATE_TIME
+			, REG_USER
+		)
+		VALUES
+		(
+			  #{colorId}
+			, #{colorName}
+			, now()
+			, 'REST_API_ADMIN'
+		)
+	</insert>
+	<insert id="insertSize" parameterType="com.ryu.bigdata.dto.models.Size">
+		INSERT INTO bigdata.SIZE
+		(
+		      SKU_ID
+			, SIZE
+			, SIZE_DESCR
+			, REG_DATE_TIME
+			, REG_USER
+		)
+		VALUES
+		(
+			  #{skuId}
+			, #{sizeName}
+			, #{sizeInfo}
+			, now()
+			, 'REST_API_ADMIN'
+		)
+	</insert>
+	<insert id="insertRetailer" parameterType="com.ryu.bigdata.dto.models.Retailer">
+		INSERT INTO bigdata.RETAILER
+		(
+			  RETAILER_CODE
+			, RETAILER_NAME
+			, REG_DATE_TIME
+			, REG_USER
+		)
+		VALUES
+		(
+			  #{retailerCode}
+			, #{retailerName}
+			, now()
+			, 'REST_API_ADMIN'
+		)
+	</insert>
+	<insert id="insertSkuRetailer" parameterType="com.ryu.bigdata.dto.models.SkuRetailer">
+		INSERT INTO bigdata.RETAILER
+		(
+			  RETAILER_CODE
+			, GOODS_ID
+		)
+		VALUES
+		(
+			  #{retailerCode}
+			, #{skuId}
+		)
+	</insert>
+
 
 	
 </mapper>

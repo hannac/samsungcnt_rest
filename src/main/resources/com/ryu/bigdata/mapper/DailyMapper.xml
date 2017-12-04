@@ -8,6 +8,87 @@
   
 <mapper namespace="com.ryu.bigdata.mapper.DailyMapper">
 
+    <insert id="insertDailyInfo" parameterType="com.ryu.bigdata.dto.models.DailyInfo">
+        INSERT INTO bigdata.DAILy_INFO
+        (
+              RETAILER_CODE
+            , DATE
+            , SALES_CNT
+            , REG_DATE_TIME
+            , REG_USER
+        )
+        VALUES
+        (
+              #{retailerCode}
+            , #{stdDate}
+            , #{salesCnt}
+            , now()
+            , 'REST_API_ADMIN'
+        )
+    </insert>
+    <insert id="insertDailySearch" parameterType="com.ryu.bigdata.dto.models.DailySearch">
+        INSERT INTO bigdata.DAILY_POP_SEARCH_WORD
+        (
+              SITE_CODE
+            , DATE
+            , SEARCH_WORD
+            , RANK
+            , SEARCH_COUNT
+            , REG_DATE_TIME
+            , REG_USER
+        )
+        VALUES
+        (
+              #{retailerCode}
+            , #{day}
+            , #{searchWord}
+            , #{rank}
+            , #{searchCnt}
+            , now()
+            , 'REST_API_ADMIN'
+        )
+    </insert>
+    <insert id="insertDailyRate" parameterType="com.ryu.bigdata.dto.models.DailyRate">
+        INSERT INTO bigdata.DAILY_GOODS_RESP_RATE
+        (
+              SKU_ID
+            , DATE
+            , CLICK_COUNT
+            , REG_DATE_TIME
+            , REG_USER
+        )
+        VALUES
+        (
+              #{retailerCode}
+            , #{day}
+            , #{clickCnt}
+            , now()
+            , 'REST_API_ADMIN'
+        )
+    </insert>
+    <insert id="insertGoosEval" parameterType="com.ryu.bigdata.dto.models.GoodsEval">
+        INSERT INTO bigdata.DAILY_GOODS_RESP_RATE
+        (
+              GOODS_ID
+            , RATER_ID
+            , EVAL_POINT
+            , GOODS_COMMENT
+            , EVAL_DATE_TIME
+            , REG_DATE_TIME
+            , REG_USER
+        )
+        VALUES
+        (
+              #{skuId}
+            , #{raterId}
+            , #{evalPoint}
+            , #{goodsComment}
+            , #{evalDateTime}
+            , now()
+            , 'REST_API_ADMIN'
+        )
+    </insert>
+
 </mapper>
 
 

@@ -1,7 +1,7 @@
 package com.ryu.bigdata.service;
 
 import com.ryu.bigdata.dto.requestDto.VectorConvertitsRequestDto;
-import com.ryu.bigdata.dto.requestDto.VectorItem;
+import com.ryu.bigdata.dto.models.VectorItem;
 import com.ryu.bigdata.dto.requestDto.VectorUpsertRequestDto;
 import com.ryu.bigdata.dto.responseDto.CommonResult;
 import com.ryu.bigdata.mapper.VectorMapper;

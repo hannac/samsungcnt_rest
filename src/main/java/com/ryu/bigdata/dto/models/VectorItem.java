@@ -1,4 +1,4 @@
-package com.ryu.bigdata.dto.requestDto;
+package com.ryu.bigdata.dto.models;
 
 import lombok.Data;
 

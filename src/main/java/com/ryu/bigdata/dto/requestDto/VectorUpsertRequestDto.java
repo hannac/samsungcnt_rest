@@ -1,5 +1,6 @@
 package com.ryu.bigdata.dto.requestDto;
 
+import com.ryu.bigdata.dto.models.VectorItem;
 import lombok.Data;
 
 import java.util.List;

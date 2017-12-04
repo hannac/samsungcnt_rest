@@ -1,5 +1,6 @@
 package com.ryu.bigdata.mapper;
 
+import com.ryu.bigdata.dto.models.*;
 import com.ryu.bigdata.vo.SkuImgVo;
 import org.mapstruct.Mapper;
 
@@ -9,10 +10,22 @@ import java.util.List;
 @Mapper
 public interface SkuBaseMapper {
 
-	/**
-	 * product 테이블의 전체 건수 카운트
-	 * @return
-	 */
-	List<SkuImgVo> selectVectorNoList(SkuImgVo skuImgVo);
-	int updateVector(SkuImgVo skuImgVo);
+	int insertSku(Sku sku);
+
+	int insertMaterial(Material material);
+
+	int insertGoodsSize(GoodsSize goodsSize);
+
+	int insertGoodsImg(GoodsImg goodsImg);
+
+	int insertBrand(Brand brand);
+
+	int insertColor(Color color);
+
+	int insertSize(Size size);
+
+	int insertRetailer(Retailer retailer);
+
+	int insertSkuRetailer(SkuRetailer skuRetailer);
+
 }
