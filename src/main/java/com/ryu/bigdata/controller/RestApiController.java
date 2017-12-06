@@ -1314,17 +1314,14 @@ public class RestApiController {
 	}
 
 	@ApiOperation(value = "이미지 영역 인식(파일업로드)")
-	@PostMapping("/image/detroi")
+	@PostMapping("/v1/image/detroi")
 	public JSONObject detroi(
 			@ApiParam(name = "vo", value = "검색조건", required = true)
 			@RequestBody SimpleImage vo) {
 		JSONObject json=null;
 		try {
-
 			ImgSearchServer imgServer=new ImgSearchServer();
-
 			json=imgServer.detroi(vo.getImage(),vo.getImageName());
-
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -1335,13 +1332,13 @@ public class RestApiController {
 	VectorService vectorService;
 
 	@ApiOperation(value = "벡터 변환 대상 이미지 검색")
-	@GetMapping("/skuImg/vector")
+	@GetMapping("/v1/skuImg/vector")
 	public Map vectorYnSearch(VectorConvertitsRequestDto vectorConvertitsRequestDto) {
 		return vectorService.selectVectorNoList(vectorConvertitsRequestDto);
 	}
 
 	@ApiOperation(value = "벡터 저장")
-	@PostMapping("/vector/upsert")
+	@PostMapping("/v1/vector/upsert")
 	public Map vectorUpsert(@RequestBody VectorUpsertRequestDto vectorUpsertRequestDto) {
 		return vectorService.upsertVector(vectorUpsertRequestDto);
 	}
@@ -1350,7 +1347,7 @@ public class RestApiController {
 	SkuService skuService;
 
 	@ApiOperation(value = "SKU")
-	@PostMapping("/skuBase")
+	@PostMapping("/v1/skuBase")
 	public Map skuBaseInsert(@RequestBody SkuRequestDto skuRequestDto) {
 		return skuService.insertSkuBase(skuRequestDto);
 	}
@@ -1359,7 +1356,7 @@ public class RestApiController {
 	DailyInfoService dailyInfoService;
 
 	@ApiOperation(value = "일일정보, 일일인기검색어, 일일상품반응률, 상품평가 ")
-	@PostMapping("/dailySearchRate")
+	@PostMapping("/v1/dailySearchRate")
 	public Map dailyInsert(@RequestBody DailyRequestDto dailyRequestDto) {
 		return dailyInfoService.insertDailyInfo(dailyRequestDto);
 	}
