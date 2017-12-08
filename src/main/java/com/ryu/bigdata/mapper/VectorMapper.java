@@ -10,11 +10,9 @@ import java.util.List;
 @Mapper
 public interface VectorMapper {
 
-	/**
-	 * product 테이블의 전체 건수 카운트
-	 * @return
-	 */
 	List<SkuImgVo> selectVectorNoList(SkuImgVo skuImgVo);
+
+	List<SkuImgVo> selectVectorYesList();
 
 	int updateVector(SkuImgVo skuImgVo);
 }

@@ -30,6 +30,15 @@ public class VectorService {
         return resultMap;
     }
 
+    public Map<String, Object> selectVectorYesList() {
+
+        Map resultMap = new HashMap();
+        List<SkuImgVo> resultList = vectorMapper.selectVectorYesList();
+        resultMap.put("data", resultList);
+        resultMap.put("result", new CommonResult());
+        return resultMap;
+    }
+
     public Map<String, Object> upsertVector(VectorUpsertRequestDto vectorUpsertRequestDto) {
 
         Map resultMap = new HashMap();
