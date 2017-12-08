@@ -1320,11 +1320,8 @@ public class RestApiController {
 			@RequestBody SimpleImage vo) {
 		JSONObject json=null;
 		try {
-
 			ImgSearchServer imgServer=new ImgSearchServer();
-
 			json=imgServer.detroi(vo.getImage(),vo.getImageName());
-
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
