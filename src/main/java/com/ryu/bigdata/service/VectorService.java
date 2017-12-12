@@ -6,10 +6,15 @@ import com.ryu.bigdata.dto.requestDto.VectorUpsertRequestDto;
 import com.ryu.bigdata.dto.responseDto.CommonResult;
 import com.ryu.bigdata.mapper.VectorMapper;
 import com.ryu.bigdata.vo.SkuImgVo;
+import jdk.nashorn.internal.parser.JSONParser;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +45,7 @@ public class VectorService {
         SkuImgVo skuImgVo = new SkuImgVo();
         skuImgVo.setSkuId(vectorConvertitsRequestDto.getSkuId());
         skuImgVo.setSkuImgId(vectorConvertitsRequestDto.getSkuImgId());
-        List<SkuImgVo> resultList = vectorMapper.selectVectorYesList(skuImgVo);
+        SkuImgVo resultList = vectorMapper.selectVectorYesOne(skuImgVo);
         resultMap.put("data", resultList);
         resultMap.put("result", new CommonResult());
         return resultMap;
@@ -60,7 +65,9 @@ public class VectorService {
                     SkuImgVo skuImgVo = new SkuImgVo();
                     skuImgVo.setSkuId(item.getSkuId());
                     skuImgVo.setSkuImgId(item.getSkuImgId());
-                    skuImgVo.setVector(item.getVector().toString());
+                    for (Object o : item.getVector()) {
+                        skuImgVo.setVector(o.toString());
+                    }
                     vectorMapper.updateVector(skuImgVo);
                 }
                 // 쿼리 호출
@@ -71,7 +78,9 @@ public class VectorService {
                 SkuImgVo skuImgVo = new SkuImgVo();
                 skuImgVo.setSkuId(vectorItem.getSkuId());
                 skuImgVo.setSkuImgId(vectorItem.getSkuImgId());
-                skuImgVo.setVector(vectorItem.getVector().toString());
+                for (Object o : vectorItem.getVector()) {
+                    skuImgVo.setVector(o.toString());
+                }
                 vectorMapper.updateVector(skuImgVo);
             }
 
@@ -82,4 +91,6 @@ public class VectorService {
         }
         return resultMap;
     }
+
+
 }

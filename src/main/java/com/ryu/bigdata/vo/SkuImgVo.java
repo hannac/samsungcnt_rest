@@ -7,7 +7,7 @@ public class SkuImgVo {
 
     private String vector;
     private int skuId;
-    private double skuImgId;
+    private int skuImgId;
     private String s3Path;
     private String regDateTime;
     private int numofvector;

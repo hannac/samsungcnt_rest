@@ -30,7 +30,7 @@
 	</select>
 
 
-	<select id="selectVectorYesList" parameterType="com.ryu.bigdata.vo.SkuImgVo" resultType="com.ryu.bigdata.vo.SkuImgVo">
+	<select id="selectVectorYesOne" parameterType="com.ryu.bigdata.vo.SkuImgVo" resultType="com.ryu.bigdata.vo.SkuImgVo">
 
 		SELECT
 			SKU_IMG_ID as skuImgId,
