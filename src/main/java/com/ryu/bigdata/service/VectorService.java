@@ -34,10 +34,13 @@ public class VectorService {
         return resultMap;
     }
 
-    public Map<String, Object> selectVectorYesList() {
+    public Map<String, Object> selectVectorYesOne(VectorConvertitsRequestDto vectorConvertitsRequestDto) {
 
         Map resultMap = new HashMap();
-        List<SkuImgVo> resultList = vectorMapper.selectVectorYesList();
+        SkuImgVo skuImgVo = new SkuImgVo();
+        skuImgVo.setSkuId(vectorConvertitsRequestDto.getSkuId());
+        skuImgVo.setSkuImgId(vectorConvertitsRequestDto.getSkuImgId());
+        List<SkuImgVo> resultList = vectorMapper.selectVectorYesList(skuImgVo);
         resultMap.put("data", resultList);
         resultMap.put("result", new CommonResult());
         return resultMap;

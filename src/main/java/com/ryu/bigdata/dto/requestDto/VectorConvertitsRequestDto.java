@@ -13,4 +13,7 @@ public class VectorConvertitsRequestDto {
     @Max(14)
     @Min(14)
     private String regDateTime; // 등록일시
+
+    private int skuId;
+    private int skuImgId;
 }

@@ -12,7 +12,7 @@ public interface VectorMapper {
 
 	List<SkuImgVo> selectVectorNoList(SkuImgVo skuImgVo);
 
-	List<SkuImgVo> selectVectorYesList();
+	List<SkuImgVo> selectVectorYesList(SkuImgVo skuImgVo);
 
 	int updateVector(SkuImgVo skuImgVo);
 }
