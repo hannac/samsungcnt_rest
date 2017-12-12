@@ -12,16 +12,19 @@
 	<select id="selectVectorNoList" parameterType="com.ryu.bigdata.vo.SkuImgVo" resultType="com.ryu.bigdata.vo.SkuImgVo">
 
 		SELECT
-			SKU_IMG_ID as skuImgId,
-			SKU_ID as skuId,
-			S3_PATH as s3Path,
-			VECTOR_NUM as numofvector
-		FROM bigdata.SKU_IMG
-		WHERE 1 = 1
-		AND VECTOR_YN = 'N'
-		AND REP_YN = 'Y'
+		a.SKU_IMG_ID AS skuImgId,
+		a.SKU_ID     AS skuId,
+		a.S3_PATH    AS s3Path,
+		a.VECTOR_NUM  AS numofvector,
+		a.REG_DATE_TIME AS regDateTime,
+		c.OWN_YN as ownYn
+		FROM bigdata.SKU_IMG a, bigdata.SKU b, bigdata.GOODS c
+		WHERE a.SKU_ID = b.SKU_ID
+		and b.GOODS_ID = c.GOODS_ID
+		AND a.VECTOR_YN = 'N'
+		AND a.REP_YN = 'Y'
 		<if test="regDateTime != null">
-			AND DATE_FORMAT(REG_DATE_TIME, '%Y-%m-%d') LIKE #{regDateTime}
+			AND DATE_FORMAT(a.REG_DATE_TIME, '%Y-%m-%d') LIKE #{regDateTime}
 		</if>
 
 	</select>

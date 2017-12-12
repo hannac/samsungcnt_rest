@@ -11,4 +11,5 @@ public class SkuImgVo {
     private String s3Path;
     private String regDateTime;
     private int numofvector;
+    private String ownYn;
 }
