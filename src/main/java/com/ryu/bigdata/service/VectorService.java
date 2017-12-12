@@ -6,6 +6,7 @@ import com.ryu.bigdata.dto.requestDto.VectorUpsertRequestDto;
 import com.ryu.bigdata.dto.responseDto.CommonResult;
 import com.ryu.bigdata.mapper.VectorMapper;
 import com.ryu.bigdata.vo.SkuImgVo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +15,15 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 public class VectorService {
 
     @Autowired
     VectorMapper vectorMapper;
 
     public Map<String, Object> selectVectorNoList(VectorConvertitsRequestDto vectorConvertitsRequestDto) {
+
+        log.debug(vectorConvertitsRequestDto.toString());
 
         Map resultMap = new HashMap();
         SkuImgVo skuImgVo = new SkuImgVo();
@@ -41,6 +45,8 @@ public class VectorService {
 
     public Map<String, Object> upsertVector(VectorUpsertRequestDto vectorUpsertRequestDto) {
 
+        log.debug(vectorUpsertRequestDto.toString());
+
         Map resultMap = new HashMap();
         try {
 
@@ -51,7 +57,7 @@ public class VectorService {
                     SkuImgVo skuImgVo = new SkuImgVo();
                     skuImgVo.setSkuId(item.getSkuId());
                     skuImgVo.setSkuImgId(item.getSkuImgId());
-                    skuImgVo.setVector(item.getVector());
+                    skuImgVo.setVector(item.getVector().toString());
                     vectorMapper.updateVector(skuImgVo);
                 }
                 // 쿼리 호출
@@ -62,12 +68,12 @@ public class VectorService {
                 SkuImgVo skuImgVo = new SkuImgVo();
                 skuImgVo.setSkuId(vectorItem.getSkuId());
                 skuImgVo.setSkuImgId(vectorItem.getSkuImgId());
-                skuImgVo.setVector(vectorItem.getVector());
+                skuImgVo.setVector(vectorItem.getVector().toString());
                 vectorMapper.updateVector(skuImgVo);
             }
 
         } catch (Exception e) {
-            e.getMessage();
+            log.error(e.getMessage());
         } finally {
             resultMap.put("result", new CommonResult());
         }

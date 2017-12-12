@@ -14,7 +14,8 @@
 		SELECT
 			SKU_IMG_ID as skuImgId,
 			SKU_ID as skuId,
-			S3_PATH as s3Path
+			S3_PATH as s3Path,
+			VECTOR_NUM as numofvector
 		FROM bigdata.SKU_IMG
 		WHERE 1 = 1
 		AND VECTOR_YN = 'N'

@@ -1285,12 +1285,8 @@ public class RestApiController {
 			@RequestBody ImageSearch vo) {
 		JSONObject json=null;
 		try {
-
 			ImgSearchServer imgServer=new ImgSearchServer();
-
-
 			json=imgServer.imageSearchByData(vo.getImage(),vo.getImageName(), vo.getX(), vo.getY(), vo.getWidth(), vo.getHeight(), vo.getRetsize(), vo.getOwnYn());
-
 		}catch(Exception e) {
 			e.printStackTrace();
 		}

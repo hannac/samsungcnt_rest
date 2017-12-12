@@ -142,25 +142,6 @@ public class ImgSearchServer {
     	// set the parameters
         List <NameValuePair> nvps = new ArrayList<NameValuePair>();
 
-        if (image == null || image_name == null) {
-            Map resultMap = new HashMap<>();
-            resultMap.put("result", "parameter null error");
-            JSONObject json = new JSONObject(resultMap);
-            return json;
-        }
-
-        if (image.equals("")) {
-            Map resultMap = new HashMap<>();
-            resultMap.put("result", "image Data error: " + image);
-            JSONObject json = new JSONObject(resultMap);
-            return json;
-        } else if (image_name.equals("")) {
-            Map resultMap = new HashMap<>();
-            resultMap.put("result", "image_name Data error: " + image_name);
-            JSONObject json = new JSONObject(resultMap);
-            return json;
-        }
-        
         nvps.add(new BasicNameValuePair("image",image));
         nvps.add(new BasicNameValuePair("image_name", image_name));
 
