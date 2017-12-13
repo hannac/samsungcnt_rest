@@ -19,6 +19,10 @@
 		<result column="end_dt"         property="endOfLife"/>
 		<result column="product_nm"     property="productNm"/>
 		<result column="item"           property="item"/>
+		<result column="typeCode"       property="typeCode"/>
+		<result column="itemClassCode"  property="itemClassCode"/>
+		<result column="itemGroup"      property="itemGroup"/>
+		<result column="itemCode"       property="itemCode"/>
 		<result column="color"          property="color"/>
 		<result column="season"         property="season"/>
 		<result column="size"           property="size"/>
@@ -34,116 +38,142 @@
 		<result column="sales"     property="sales"/>
 	</resultMap>
 
-	<select id="selectCount" resultType="int">
-		SELECT count(*) cnt
-		  FROM product 
-	</select>
-	
-	<select id="selectMaxID" resultType="int">
-		SELECT MAX(product_id) AS ProductId
-		  FROM product
-	</select>
-	
 	<!-- resultType 대신 resultMap 으로 결과셋 처리하고 productMap 으로 받도록 설정 -->
 	<select id="selectProductInfo" parameterType="long" resultMap="productMap">
-		SELECT product_id
-		     , product_cd
-		     , acc_sales
-		     , brand_nm
-		     , DATE_FORMAT(release_dt,'%Y%m%d') AS release_dt
-		     , retail_price
-		     , DATE_FORMAT(end_dt,'%Y%m%d') AS end_dt
-		     , product_nm
-		     , item
-		     , color
-		     , season
-		     , size
-		     , fabric
-		     , img_url_01
-		     , crawl_url
-		     , own_product_yn
-		     , file_nm
-		 FROM product 
-		WHERE product_id = #{value}
-		LIMIT 1
+
+		SELECT
+			PS.SKU_ID AS productId
+			, PS.SKU_CODE AS productCd
+			, (SELECT SUM(SWI.SALES_CNT) FROM SKU_WEEKLY_INFO SWI WHERE SWI.SKU_ID = PS.SKU_ID) AS accSales
+			, BRAND_NAME AS brandNm
+			, PS.SALES_START_DATE AS releaseDt
+			, G.TAG_PRICE AS retailPrice
+			, PS.SALES_END_DATE AS endOfLife
+			, PS.SKU_NAME AS productNm
+			, '' AS item
+			, (SELECT TYPE__NAME FROM ITEM_TYPE WHERE TYPE_CODE = G.TYPE_CODE LIMIT 1) AS typeCode
+			, (SELECT ITEM_CLASS_NAME FROM ITEM_CLASS WHERE ITEM_CLASS_CODE = G.ITEM_CLASS_CODE LIMIT 1) AS itemClassCode
+			, (SELECT GROUP_NAME FROM ITEM_GROUP WHERE G.GROUP_CODE = G.GROUP_CODE LIMIT 1) AS itemGroup
+			, (SELECT ITEM_NAME FROM ITEM WHERE ITEM_CODE = G.ITEM_CODE LIMIT 1) AS itemCode
+			, GC.COLOR_ID AS color
+			, G.SEASON AS season
+			, '' AS size /* 현재 없음 */
+			, GM.MATERIAL_NAME AS fabric
+			, SI.S3_PATH AS imgUrl01
+			, PS.COLLECT_PATH AS crawlUrl
+			, G.OWN_YN AS ownProductYn
+			, '' as fileNm /* 현재 없음 */
+		FROM SKU PS LEFT JOIN SKU_SIZE SS ON PS.SKU_ID = SS.SKU_ID
+			LEFT JOIN SKU_IMG SI ON PS.SKU_ID = SI.SKU_ID
+			LEFT JOIN GOODS G ON PS.GOODS_ID = G.GOODS_ID
+			LEFT JOIN BRAND B ON G.BRAND_ID = B.BRAND_ID
+			LEFT JOIN GOODS_MATERIAL GM ON G.GOODS_ID = GM.GOODS_ID
+			LEFT JOIN GOODS_COLOR GC ON G.GOODS_ID = GC.GOODS_ID
+			WHERE PS.SKU_ID = ${value}
+			LIMIT 1
+
 	</select>
-	
+
 	<!-- resultType 대신 resultMap 으로 결과셋 처리하고 productMap 으로 받도록 설정 -->
 	<select id="selectProductInfoByImg" parameterType="String" resultMap="productMap">
-		SELECT product_id
-		     , product_cd
-		     , acc_sales
-		     , brand_nm
-		     , DATE_FORMAT(release_dt,'%Y%m%d') AS release_dt
-		     , retail_price
-		     , DATE_FORMAT(end_dt,'%Y%m%d') AS end_dt
-		     , product_nm
-		     , item
-		     , color
-		     , season
-		     , size
-		     , fabric
-		     , img_url_01
-		     , crawl_url
-		     , own_product_yn
-		     , file_nm
-		 FROM product 
-		WHERE file_nm = #{value}
-		<!-- WHERE img_url_01 LIKE CONCAT('%',#{value},'%') -->
-		  AND own_product_yn = 'N'
-		LIMIT 1
+		SELECT
+			PS.SKU_ID AS productId
+			, PS.SKU_CODE AS productCd
+			, (SELECT SUM(SWI.SALES_CNT) FROM SKU_WEEKLY_INFO SWI WHERE SWI.SKU_ID = PS.SKU_ID) AS accSales
+			, BRAND_NAME AS brandNm
+			, PS.SALES_START_DATE AS releaseDt
+			, G.TAG_PRICE AS retailPrice
+			, PS.SALES_END_DATE AS endOfLife
+			, PS.SKU_NAME AS productNm
+			, '' AS item
+			, (SELECT TYPE__NAME FROM ITEM_TYPE WHERE TYPE_CODE = G.TYPE_CODE LIMIT 1) AS typeCode
+			, (SELECT ITEM_CLASS_NAME FROM ITEM_CLASS WHERE ITEM_CLASS_CODE = G.ITEM_CLASS_CODE LIMIT 1) AS itemClassCode
+			, (SELECT GROUP_NAME FROM ITEM_GROUP WHERE G.GROUP_CODE = G.GROUP_CODE LIMIT 1) AS itemGroup
+			, (SELECT ITEM_NAME FROM ITEM WHERE ITEM_CODE = G.ITEM_CODE LIMIT 1) AS itemCode
+			, GC.COLOR_ID AS color
+			, G.SEASON AS season
+			, '' AS size /* 현재 없음 */
+			, GM.MATERIAL_NAME AS fabric
+			, SI.S3_PATH AS imgUrl01
+			, PS.COLLECT_PATH AS crawlUrl
+			, G.OWN_YN AS ownProductYn
+			, '' as fileNm /* 현재 없음 */
+		FROM SKU PS LEFT JOIN SKU_SIZE SS ON PS.SKU_ID = SS.SKU_ID
+			LEFT JOIN SKU_IMG SI ON PS.SKU_ID = SI.SKU_ID
+			LEFT JOIN GOODS G ON PS.GOODS_ID = G.GOODS_ID
+			LEFT JOIN BRAND B ON G.BRAND_ID = B.BRAND_ID
+			LEFT JOIN GOODS_MATERIAL GM ON G.GOODS_ID = GM.GOODS_ID
+			LEFT JOIN GOODS_COLOR GC ON G.GOODS_ID = GC.GOODS_ID
+			WHERE PS.SKU_ID = ${value}
+			AND G.OWN_YN = 'N'
+			LIMIT 1
 	</select>
-	
+
 	<select id="selectWeeklyInfo" parameterType="com.ryu.bigdata.vo.WeeklySalesSearch" resultMap="WeeklySalesMap">
-        SELECT CONCAT(years, '_', weeks) AS week
-			 , sales_cnt AS sales
-		  FROM sale_weekly
-		 WHERE product_id = #{productId}
-           AND years BETWEEN #{startYear} AND #{endYear}
-           AND weeks BETWEEN #{startWeek} AND #{endWeek}
+
+		<![CDATA[
+			SELECT
+				SUM(SALES_CNT) AS sales
+				, CONCAT(YEAR, '_', WEEK_NUMBER) AS week
+			FROM SKU_WEEKLY_INFO
+			WHERE SKU_ID = #{productId}
+			AND YEAR BETWEEN #{startYear} AND #{endYear}
+			AND START_DATE >= #{startWeek}
+			AND END_DATE <= #{endWeek}
+			GROUP BY WEEK_NUMBER
+		]]>
+
 	</select>
-	
-	
-	
-	<!-- 시연용 -->
-	<select id="selectProductInfoByProductCD" parameterType="String" resultMap="productMap">
-		SELECT product_id
-		     , product_cd
-		     , acc_sales
-		     , brand_nm
-		     , DATE_FORMAT(release_dt,'%Y%m%d') AS release_dt
-		     , retail_price
-		     , DATE_FORMAT(end_dt,'%Y%m%d') AS end_dt
-		     , product_nm
-		     , item
-		     , color
-		     , season
-		     , size
-		     , fabric
-		     , img_url_01
-		     , crawl_url
-		     , own_product_yn
-		     , file_nm
-		 FROM product 
-		WHERE product_cd = #{value}
-		  AND own_product_yn = 'Y'
-		LIMIT 1
-	</select>
-	
-	<insert id="insertProductInfo" parameterType="com.ryu.bigdata.vo.Product">
-		Insert Into product(product_cd, img_url_01, own_product_yn, reg_date, file_nm) 
-		values(#{productCd}, #{imageUrl}, #{ownProductYn}, now(), #{fileNm})
-	</insert>
-	
-	<insert id="insertProductDetailInfo" parameterType="com.ryu.bigdata.vo.Product">
-		Insert Into product(product_cd, acc_sales, brand_nm, release_dt, retail_price, end_dt, 
-			product_nm, item, color, season, size, fabric, img_url_01, crawl_url, own_product_yn,
-			file_nm)
-		values(#{productCd}, #{accSales}, #{brandNm}, #{releaseDt}, #{retailPrice}, #{endOfLife}, 
-			#{productNm}, #{item}, #{color}, #{season}, #{size}, #{fabric}, #{imageUrl}, #{crawlUrl} ,
-			#{ownProductYn}, #{fileNm})
-	</insert>
-	
+
+	<!--<select id="selectCount" resultType="int">-->
+		<!--SELECT count(*) cnt-->
+		  <!--FROM product -->
+	<!--</select>-->
+	<!---->
+	<!--<select id="selectMaxID" resultType="int">-->
+		<!--SELECT MAX(product_id) AS ProductId-->
+		  <!--FROM product-->
+	<!--</select>-->
+
+	<!--&lt;!&ndash; 시연용 &ndash;&gt;-->
+	<!--<select id="selectProductInfoByProductCD" parameterType="String" resultMap="productMap">-->
+		<!--SELECT product_id-->
+		     <!--, product_cd-->
+		     <!--, acc_sales-->
+		     <!--, brand_nm-->
+		     <!--, DATE_FORMAT(release_dt,'%Y%m%d') AS release_dt-->
+		     <!--, retail_price-->
+		     <!--, DATE_FORMAT(end_dt,'%Y%m%d') AS end_dt-->
+		     <!--, product_nm-->
+		     <!--, item-->
+		     <!--, color-->
+		     <!--, season-->
+		     <!--, size-->
+		     <!--, fabric-->
+		     <!--, img_url_01-->
+		     <!--, crawl_url-->
+		     <!--, own_product_yn-->
+		     <!--, file_nm-->
+		 <!--FROM product -->
+		<!--WHERE product_cd = #{value}-->
+		  <!--AND own_product_yn = 'Y'-->
+		<!--LIMIT 1-->
+	<!--</select>-->
+	<!---->
+	<!--<insert id="insertProductInfo" parameterType="com.ryu.bigdata.vo.Product">-->
+		<!--Insert Into product(product_cd, img_url_01, own_product_yn, reg_date, file_nm) -->
+		<!--values(#{productCd}, #{imageUrl}, #{ownProductYn}, now(), #{fileNm})-->
+	<!--</insert>-->
+	<!---->
+	<!--<insert id="insertProductDetailInfo" parameterType="com.ryu.bigdata.vo.Product">-->
+		<!--Insert Into product(product_cd, acc_sales, brand_nm, release_dt, retail_price, end_dt, -->
+			<!--product_nm, item, color, season, size, fabric, img_url_01, crawl_url, own_product_yn,-->
+			<!--file_nm)-->
+		<!--values(#{productCd}, #{accSales}, #{brandNm}, #{releaseDt}, #{retailPrice}, #{endOfLife}, -->
+			<!--#{productNm}, #{item}, #{color}, #{season}, #{size}, #{fabric}, #{imageUrl}, #{crawlUrl} ,-->
+			<!--#{ownProductYn}, #{fileNm})-->
+	<!--</insert>-->
+	<!---->
 </mapper>
 
 

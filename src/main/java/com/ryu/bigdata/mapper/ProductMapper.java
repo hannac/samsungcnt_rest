@@ -17,14 +17,14 @@ public interface ProductMapper {
 	 * product 테이블의 전체 건수 카운트
 	 * @return
 	 */
-	public Integer selectCount();
-	public Product selectProductInfo(long productId);
-	public Product selectProductInfoByImg(String ImageUrl);
-	public List<WeeklySales> selectWeeklyInfo(WeeklySalesSearch weeklySalesSearch);
+//	public Integer selectCount();
+	Product selectProductInfo(long productId);
+	Product selectProductInfoByImg(String ImageUrl);
+	List<WeeklySales> selectWeeklyInfo(WeeklySalesSearch weeklySalesSearch);
 	
 	// 시연용
-	public Product selectProductInfoByProductCD(String productCd);
-	public void insertProductInfo(Product product);
-	public void insertProductDetailInfo(Product product);
-	public int selectMaxID();
+//	public Product selectProductInfoByProductCD(String productCd);
+//	public void insertProductInfo(Product product);
+//	public void insertProductDetailInfo(Product product);
+//	public int selectMaxID();
 }

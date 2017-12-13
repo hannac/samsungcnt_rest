@@ -202,6 +202,32 @@ public class RestApiController {
 		return json;
 	}
 
+	private void setProductProc(Search[] s, List<Product> products) {
+		for (int z = 0; z < s.length; z++) {
+
+			if(!s[z].getOurs().equals("True")) {
+				// 경쟁사인 경우 이미지 이름으로 불러와서 사용
+				Product p = mapper.selectProductInfoByImg(s[z].getImage_name());
+				p.setImageUrl(s[z].getS3url()); // 임시
+				p.setSimillarScore(Float.parseFloat(s[z].getScore()));
+				products.add(p);
+
+			} else {
+				// 자사인 경우 정보가 없으므로 이미지만 담아서 반환
+				Product p = new Product();
+
+				if (p != null) {
+					p.setImageUrl(s[z].getS3url());
+					p.setSimillarScore(Float.parseFloat(s[z].getScore()));
+					p.setOwnProductYn("Y");
+					p.setProductCd(s[z].getProduct_num());
+					p.setFileNm(s[z].getImage_name());
+					products.add(p);
+				}
+			}
+		}
+	}
+
 	// 2.3
 	// /v1/image/file
 	@SuppressWarnings({ "unchecked" })
@@ -254,49 +280,7 @@ public class RestApiController {
 
 		// 리스트로 반환
 		List<Product> products = new ArrayList<Product>();
-
-		for (int z = 0; z < s.length; z++) {
-
-			if(!s[z].getOurs().equals("True")) {
-				// 경쟁사인 경우 이미지 이름으로 불러와서 사용
-				Product p = mapper.selectProductInfoByImg(s[z].getImage_name());
-
-				// 시연용
-				if (p == null) {
-					// DATA 가 없을 경우 목업을 채우고
-					initProductsDatabyIdx();
-					p = getProductsDatabyIdx(z); // 목업 데이터로 채우기
-					p.setImageUrl(s[z].getS3url()); // 임시
-					p.setOwnProductYn("N");
-					p.setFileNm(s[z].getImage_name());
-
-					// 저장하고
-					mapper.insertProductDetailInfo(p);
-
-					// 다시 불러오기
-					p = mapper.selectProductInfoByImg(s[z].getImage_name());
-				}
-
-				p.setImageUrl(s[z].getS3url()); // 임시
-				p.setSimillarScore(Float.parseFloat(s[z].getScore()));
-				products.add(p);
-
-			} else {
-				// 자사인 경우 정보가 없으므로 이미지만 담아서 반환
-				Product p = new Product();
-
-				if (p != null) {
-					p.setImageUrl(s[z].getS3url());
-					p.setSimillarScore(Float.parseFloat(s[z].getScore()));
-					p.setOwnProductYn("Y");
-					p.setProductCd(s[z].getProduct_num().replaceAll(".jpg", "").replaceAll(".jpeg", ""));
-					p.setFileNm(s[z].getImage_name());
-
-					p = setTestData(p); // 시연용
-					products.add(p);
-				}
-			}
-		}
+		setProductProc(s, products);
 
 		// 목록에 추가된 제품 정보가 없으면 컨텐츠 없음 예외 발생
 		if (products.size() == 0) {
@@ -371,50 +355,7 @@ public class RestApiController {
 
 		// 리스트로 반환
 		List<Product> products = new ArrayList<Product>();
-
-		for (int z = 0; z < s.length; z++) {
-
-			if(!s[z].getOurs().equals("True")) {
-				// 경쟁사인 경우
-				Product p = mapper.selectProductInfoByImg(s[z].getImage_name());
-
-				// DB 에 DATA가 없을경우 새로 저장
-				if (p == null) {
-					// 목업을 채운다.
-					initProductsDatabyIdx();
-					p = getProductsDatabyIdx(z); // 목업 데이터로 채우기
-					p.setImageUrl(s[z].getS3url()); // 임시
-					p.setOwnProductYn("N");
-					p.setFileNm(s[z].getImage_name());
-
-					// 저장한다.
-					mapper.insertProductDetailInfo(p);
-
-					// 다시 불러온다.
-					p = mapper.selectProductInfoByImg(s[z].getImage_name());
-				}
-
-				p.setImageUrl(s[z].getS3url()); // 임시
-				p.setSimillarScore(Float.parseFloat(s[z].getScore()));
-				products.add(p);
-
-
-			} else {
-				// 자사인 경우 정보가 없으므로 이미지만 담아서 반환
-				Product p = new Product();
-
-				if (p != null) {
-					p.setImageUrl(s[z].getS3url());
-					p.setSimillarScore(Float.parseFloat(s[z].getScore()));
-					p.setOwnProductYn("Y");
-					p.setProductCd(s[z].getProduct_num().replaceAll(".jpg", "").replaceAll(".jpeg", ""));
-					p.setFileNm(s[z].getImage_name());
-
-					p = setTestData(p); // 시연용
-					products.add(p);
-				}
-			}
-		}
+		setProductProc(s, products);
 
 		// 목록에 추가된 제품 정보가 없으면 컨텐츠 없음 예외 발생
 		if (products.size() == 0) {
@@ -492,47 +433,7 @@ public class RestApiController {
 		List<Product> products = new ArrayList<Product>();
 
 		try {
-			for (int z = 0; z < s.length; z++) {
-
-				if(!s[z].getOurs().equals("True")) {
-					// 경쟁사인경우
-					Product p = mapper.selectProductInfoByImg(s[z].getImage_name());
-
-					// DATA가 없으면 입력해 주시
-					if (p == null) {
-						// 목업 데이터 채우기
-						initProductsDatabyIdx();
-						p = getProductsDatabyIdx(z); // 목업 데이터로 채우기
-						p.setImageUrl(s[z].getS3url()); // 임시
-						p.setOwnProductYn("N");
-						p.setFileNm(s[z].getImage_name());
-
-						// DB 에 저장하기
-						mapper.insertProductDetailInfo(p);
-
-						// 다시 불러오기
-						p = mapper.selectProductInfoByImg(s[z].getImage_name());
-					}
-
-					p.setImageUrl(s[z].getS3url()); // 임시
-					p.setSimillarScore(Float.parseFloat(s[z].getScore()));
-					products.add(p);
-				} else {
-					// 자사인 경우 정보가 없으므로 이미지만 담아서 반환
-					Product p = new Product();
-
-					if (p != null) {
-						p.setImageUrl(s[z].getS3url());
-						p.setSimillarScore(Float.parseFloat(s[z].getScore()));
-						p.setOwnProductYn("Y");
-						p.setProductCd(s[z].getProduct_num().replaceAll(".jpg", "").replaceAll(".jpeg", ""));
-						p.setFileNm(s[z].getImage_name());
-
-						p = setTestData(p); // 시연용
-						products.add(p);
-					}
-				}
-			}
+			setProductProc(s, products);
 		} catch (Exception e) {
 			e.printStackTrace();
 			success = e.getMessage();
@@ -621,37 +522,17 @@ public class RestApiController {
 			if(!s[z].getOurs().equals("True")) {
 				// 경쟁사일 경우
 				p = mapper.selectProductInfoByImg(s[z].getImage_name());
-
-				// DATA가 없으면 새로 입력해 준다
-				if (p == null) {
-					// 목업 채우기
-					initProductsDatabyIdx();
-					p = getProductsDatabyIdx(z); // 목업 데이터로 채우기
-					p.setImageUrl(s[z].getS3url()); // 임시
-					p.setOwnProductYn("N");
-					p.setFileNm(s[z].getImage_name());
-
-					// DB 에 저장하기
-					mapper.insertProductDetailInfo(p);
-
-					// 새로 가져오기
-					p = mapper.selectProductInfoByImg(s[z].getImage_name());
-				}
-
 				p.setImageUrl(s[z].getS3url()); // 임시
 				p.setSimillarScore(Float.parseFloat(s[z].getScore()));
 			} else {
 				// 자사인 경우 정보가 없으므로 이미지만 담아서 반환
 				p = new Product();
-
 				if (p != null) {
 					p.setImageUrl(s[z].getS3url());
 					p.setSimillarScore(Float.parseFloat(s[z].getScore()));
 					p.setOwnProductYn("Y");
-					p.setProductCd(s[z].getProduct_num().replaceAll(".jpg", "").replaceAll(".jpeg", ""));
+					p.setProductCd(s[z].getProduct_num());
 					p.setFileNm(s[z].getImage_name());
-
-					p = setTestData(p); // 시연용
 				}
 			}
 
@@ -777,47 +658,7 @@ public class RestApiController {
 
 		// 리스트로 반환
 		List<Product> products = new ArrayList<Product>();
-
-		for (int z = 0; z < s.length; z++) {
-
-			if(!s[z].getOurs().equals("True")) {
-				Product p = mapper.selectProductInfoByImg(s[z].getImage_name());
-
-				// DATA가 없으면
-				if (p == null) {
-					// 목업 채우기
-					initProductsDatabyIdx();
-					p = getProductsDatabyIdx(z); // 목업 데이터로 채우기
-					p.setImageUrl(s[z].getS3url()); // 임시
-					p.setOwnProductYn("N");
-					p.setFileNm(s[z].getImage_name());
-
-					// DB에 저장하기
-					mapper.insertProductDetailInfo(p);
-
-					// 다시 불러오기
-					p = mapper.selectProductInfoByImg(s[z].getImage_name());
-				}
-
-				p.setImageUrl(s[z].getS3url()); // 임시
-				p.setSimillarScore(Float.parseFloat(s[z].getScore()));
-				products.add(p);
-			} else {
-				// 자사인 경우 정보가 없으므로 이미지만 담아서 반환
-				Product p = new Product();
-
-				if (p != null) {
-					p.setImageUrl(s[z].getS3url());
-					p.setSimillarScore(Float.parseFloat(s[z].getScore()));
-					p.setOwnProductYn("Y");
-					p.setProductCd(s[z].getProduct_num().replaceAll(".jpg", "").replaceAll(".jpeg", ""));
-					p.setFileNm(s[z].getImage_name());
-
-					p = setTestData(p); // 시연용
-					products.add(p);
-				}
-			}
-		}
+		setProductProc(s, products);
 
 		// 목록에 추가된 제품이 없으면 컨텐츠 없음 예외 발생
 		if (products.size() == 0) {
@@ -875,20 +716,20 @@ public class RestApiController {
 	}
 
 
-	public Product setTestData(Product product)
-	{
-		Product p = mapper.selectProductInfoByProductCD(product.getProductCd());
-
-		if(p == null)
-		{
-			mapper.insertProductInfo(product);
-			p = mapper.selectProductInfoByProductCD(product.getProductCd());
-		}
-
-		p.setSimillarScore(product.getSimillarScore());
-		p.setImageUrl(product.getImageUrl());
-		return p;
-	}
+//	public Product setTestData(Product product)
+//	{
+//		Product p = mapper.selectProductInfoByProductCD(product.getProductCd());
+//
+//		if(p == null)
+//		{
+//			mapper.insertProductInfo(product);
+//			p = mapper.selectProductInfoByProductCD(product.getProductCd());
+//		}
+//
+//		p.setSimillarScore(product.getSimillarScore());
+//		p.setImageUrl(product.getImageUrl());
+//		return p;
+//	}
 
 	// 임시로 사용하는 함수
 	public Search[] getTempImageList(Search[] s)
@@ -939,74 +780,74 @@ public class RestApiController {
 		pmList = new ArrayList<Product>();
 
 		int productId = 816303;
-		int productCd = mapper.selectMaxID(); // 시연을 위해 MAX 값을 가져온다
+//		int productCd = mapper.selectMaxID(); // 시연을 위해 MAX 값을 가져온다
 
 		for(int z=0; z<10; z++)
 		{
-			imgUrl = hostUrl + "/MIXXO/1609038732_49.jpg";
-			crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609038732";
-			pm = new Product(productId--,"CJ" + productCd++,8,"MIXXO","2017-03-06",79900,"2017-03-18","하프 패치 야상점퍼 / (49)KHAKI","Outer","KHAKI","ALL","100",
-					"면",imgUrl,crawlUrl,"N",(float) 0.9);
-			pmList.add(pm);
-
-			imgUrl = hostUrl + "/HM/0379457_73.jpeg";
-			crawlUrl = "http://www2.hm.com/ko_kr/productpage.0379457007.html";
-			pm = new Product(productId--,"CJ" + productCd++,0,"HM","2017-03-10",39000,"2017-09-18","카고 셔츠 / 73 다크 블루","가디건 & 풀오버","73 다크 블루","ALL","XS",
-					"코튼",imgUrl,crawlUrl,"N",(float) 0.1);
-			pmList.add(pm);
-
-			imgUrl = hostUrl + "/ZARA/6895_066_카키.jpg";
-			crawlUrl = "https://www.zara.com/kr/ko/woman/%EC%95%84%EC%9A%B0%ED%84%B0/%ED%8C%8C%EC%B9%B4/%EC%9E%90%EC%88%98-%EC%98%A4%EB%B2%84%EC%85%94%EC%B8%A0-c710516p4378515.html";
-			pm = new Product(productId--,"CJ" + productCd++,32,"ZARA","2017-04-27",99000,"2017-06-19","자수 오버셔츠 / 카키","블레이저","카키","ALL","S (KR 55)",
-					"면",imgUrl,crawlUrl,"N",(float) 0.5);
-			pmList.add(pm);
-
-			imgUrl = hostUrl + "/MIXXO/1702144672_49.jpg";
-			crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1702144672";
-			pm = new Product(productId--,"CJ" + productCd++,14,"MIXXO","2017-03-06",89900,"2017-08-25","플라워 자수 야상점퍼 MIWJJ7321S / (49)KHAKI","Outer","KHAKI","ALL","M",
-					"면",imgUrl,crawlUrl,"N",(float) 0.1);
-			pmList.add(pm);
-
-			imgUrl = hostUrl + "/HM/0446836_09.jpeg";
-			crawlUrl = "http://www2.hm.com/ko_kr/productpage.0446836008.html";
-			pm = new Product(productId--,"CJ" + productCd++,0,"HM","2017-03-10",29000,"2017-07-17","크롭트 플란넬 셔츠 / 09 블랙","가디건 & 풀오버","09 블랙","ALL","32",
-					"코튼",imgUrl,crawlUrl,"N",(float) 0.6);
-			pmList.add(pm);
-
-			imgUrl = hostUrl + "/HM/0485808_19.jpeg";
-			crawlUrl = "http://www2.hm.com/ko_kr/productpage.0485808001.html";
-			pm = new Product(productId--,"CJ" + productCd++,0,"HM","2017-03-10",59000,"2017-06-19","유틸리티 재킷 / 19 카키 그린","베이직","19 카키 그린","ALL","32",
-					"코튼",imgUrl,crawlUrl,"N",(float) 0.4);
-			pmList.add(pm);
-
-			imgUrl = hostUrl + "/MIXXO/1609022962_49.jpg";
-			crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609022962";
-			pm = new Product(productId--,"CJ" + productCd++,-4,"MIXXO","2017-03-06",79900,"2017-03-18","레터링패치 카키셔츠 / (49)KHAKI","Blouse/Shirts","KHAKI","ALL","100",
-					"면",imgUrl,crawlUrl,"N",(float) 0.1);
-			pmList.add(pm);
-
-			imgUrl = hostUrl + "/HM/0510959_99.jpeg";
-			crawlUrl = "http://www2.hm.com/ko_kr/productpage.0510959003.html";
-			pm = new Product(productId--,"CJ" + productCd++,0,"HM","2017-03-10",59000,"2017-09-18","유틸리티 후드 재킷 / 99 다크 카키 그린","베이직","99 다크 카키 그린","ALL","32",
-					"코튼",imgUrl,crawlUrl,"N",(float) 0.3);
-			pmList.add(pm);
-
-			imgUrl = hostUrl + "/ZARA/6985_401_카키.jpg";
-			crawlUrl = "https://www.zara.com/kr/ko/man/%EC%9E%90%EC%BC%93/%EB%A1%B1-%EC%BD%94%ED%8A%BC-%ED%8C%8C%EC%B9%B4-c586542p4081997.html";
-			pm = new Product(productId--,"CJ" + productCd++,65,"ZARA","2017-02-13",159000,"2017-03-30","롱 코튼 파카 / 카키","봄버자켓","카키","ALL","L (KR 100~105)",
-					"면",imgUrl,crawlUrl,"N",(float) 0.4);
-			pmList.add(pm);
-
-			imgUrl = hostUrl + "/ZARA/6985_401_카키.jpg";
-			crawlUrl = "http://www.lotte.com/goods/viewGoodsDetail.lotte?goods_no=451427774";
-			pm = new Product(productId--,"CJ" + productCd++,65,"LOTTE","2017-02-13",159000,"2017-03-30","롱 코튼 파카 / 카키","봄버자켓","카키","ALL","L (KR 100~105)",
-					"면",imgUrl,crawlUrl,"N",(float) 0.4);
-			pmList.add(pm);
-
-			imgUrl = hostUrl + "/MIXXO/1609038732_49.jpg";
-			crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609038732";
-			pm = new Product(productId--,"CJ" + productCd++,8,"MIXXO","2017-03-06",79900,"2017-03-18","하프 패치 야상점퍼 / (49)KHAKI","Outer","KHAKI","ALL","100",
-					"면",imgUrl,crawlUrl,"N",(float) 0.9);
+//			imgUrl = hostUrl + "/MIXXO/1609038732_49.jpg";
+//			crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609038732";
+//			pm = new Product(productId--,"CJ" + productCd++,8,"MIXXO","2017-03-06",79900,"2017-03-18","하프 패치 야상점퍼 / (49)KHAKI","Outer","KHAKI","ALL","100",
+//					"면",imgUrl,crawlUrl,"N",(float) 0.9);
+//			pmList.add(pm);
+//
+//			imgUrl = hostUrl + "/HM/0379457_73.jpeg";
+//			crawlUrl = "http://www2.hm.com/ko_kr/productpage.0379457007.html";
+//			pm = new Product(productId--,"CJ" + productCd++,0,"HM","2017-03-10",39000,"2017-09-18","카고 셔츠 / 73 다크 블루","가디건 & 풀오버","73 다크 블루","ALL","XS",
+//					"코튼",imgUrl,crawlUrl,"N",(float) 0.1);
+//			pmList.add(pm);
+//
+//			imgUrl = hostUrl + "/ZARA/6895_066_카키.jpg";
+//			crawlUrl = "https://www.zara.com/kr/ko/woman/%EC%95%84%EC%9A%B0%ED%84%B0/%ED%8C%8C%EC%B9%B4/%EC%9E%90%EC%88%98-%EC%98%A4%EB%B2%84%EC%85%94%EC%B8%A0-c710516p4378515.html";
+//			pm = new Product(productId--,"CJ" + productCd++,32,"ZARA","2017-04-27",99000,"2017-06-19","자수 오버셔츠 / 카키","블레이저","카키","ALL","S (KR 55)",
+//					"면",imgUrl,crawlUrl,"N",(float) 0.5);
+//			pmList.add(pm);
+//
+//			imgUrl = hostUrl + "/MIXXO/1702144672_49.jpg";
+//			crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1702144672";
+//			pm = new Product(productId--,"CJ" + productCd++,14,"MIXXO","2017-03-06",89900,"2017-08-25","플라워 자수 야상점퍼 MIWJJ7321S / (49)KHAKI","Outer","KHAKI","ALL","M",
+//					"면",imgUrl,crawlUrl,"N",(float) 0.1);
+//			pmList.add(pm);
+//
+//			imgUrl = hostUrl + "/HM/0446836_09.jpeg";
+//			crawlUrl = "http://www2.hm.com/ko_kr/productpage.0446836008.html";
+//			pm = new Product(productId--,"CJ" + productCd++,0,"HM","2017-03-10",29000,"2017-07-17","크롭트 플란넬 셔츠 / 09 블랙","가디건 & 풀오버","09 블랙","ALL","32",
+//					"코튼",imgUrl,crawlUrl,"N",(float) 0.6);
+//			pmList.add(pm);
+//
+//			imgUrl = hostUrl + "/HM/0485808_19.jpeg";
+//			crawlUrl = "http://www2.hm.com/ko_kr/productpage.0485808001.html";
+//			pm = new Product(productId--,"CJ" + productCd++,0,"HM","2017-03-10",59000,"2017-06-19","유틸리티 재킷 / 19 카키 그린","베이직","19 카키 그린","ALL","32",
+//					"코튼",imgUrl,crawlUrl,"N",(float) 0.4);
+//			pmList.add(pm);
+//
+//			imgUrl = hostUrl + "/MIXXO/1609022962_49.jpg";
+//			crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609022962";
+//			pm = new Product(productId--,"CJ" + productCd++,-4,"MIXXO","2017-03-06",79900,"2017-03-18","레터링패치 카키셔츠 / (49)KHAKI","Blouse/Shirts","KHAKI","ALL","100",
+//					"면",imgUrl,crawlUrl,"N",(float) 0.1);
+//			pmList.add(pm);
+//
+//			imgUrl = hostUrl + "/HM/0510959_99.jpeg";
+//			crawlUrl = "http://www2.hm.com/ko_kr/productpage.0510959003.html";
+//			pm = new Product(productId--,"CJ" + productCd++,0,"HM","2017-03-10",59000,"2017-09-18","유틸리티 후드 재킷 / 99 다크 카키 그린","베이직","99 다크 카키 그린","ALL","32",
+//					"코튼",imgUrl,crawlUrl,"N",(float) 0.3);
+//			pmList.add(pm);
+//
+//			imgUrl = hostUrl + "/ZARA/6985_401_카키.jpg";
+//			crawlUrl = "https://www.zara.com/kr/ko/man/%EC%9E%90%EC%BC%93/%EB%A1%B1-%EC%BD%94%ED%8A%BC-%ED%8C%8C%EC%B9%B4-c586542p4081997.html";
+//			pm = new Product(productId--,"CJ" + productCd++,65,"ZARA","2017-02-13",159000,"2017-03-30","롱 코튼 파카 / 카키","봄버자켓","카키","ALL","L (KR 100~105)",
+//					"면",imgUrl,crawlUrl,"N",(float) 0.4);
+//			pmList.add(pm);
+//
+//			imgUrl = hostUrl + "/ZARA/6985_401_카키.jpg";
+//			crawlUrl = "http://www.lotte.com/goods/viewGoodsDetail.lotte?goods_no=451427774";
+//			pm = new Product(productId--,"CJ" + productCd++,65,"LOTTE","2017-02-13",159000,"2017-03-30","롱 코튼 파카 / 카키","봄버자켓","카키","ALL","L (KR 100~105)",
+//					"면",imgUrl,crawlUrl,"N",(float) 0.4);
+//			pmList.add(pm);
+//
+//			imgUrl = hostUrl + "/MIXXO/1609038732_49.jpg";
+//			crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609038732";
+//			pm = new Product(productId--,"CJ" + productCd++,8,"MIXXO","2017-03-06",79900,"2017-03-18","하프 패치 야상점퍼 / (49)KHAKI","Outer","KHAKI","ALL","100",
+//					"면",imgUrl,crawlUrl,"N",(float) 0.9);
 		}
 
 		return;
@@ -1072,104 +913,104 @@ public class RestApiController {
 		for(int z=0; z < productId.getProductId().length; z++)
 		{
 
-			if(productId.getProductId()[z].equals("52540"))
-			{
-				imgUrl = hostUrl + "/MIXXO/1609038732_49.jpg";
-				crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609038732";
-				pm = new Product(52540,"1609038732",8,"MIXXO","20170306",79900,"20170318","하프 패치 야상점퍼 / (49)KHAKI","Outer","KHAKI","ALL","100",
-						"면",imgUrl,crawlUrl,"N",(float) 0.9);
-
-				products.add(pm);
-			}
-
-			if(productId.getProductId()[z].equals("66918"))
-			{
-				imgUrl = hostUrl + "/HM/0379457_73.jpeg";
-				crawlUrl = "http://www2.hm.com/ko_kr/productpage.0379457007.html";
-				pm = new Product(66918,"0379457",0,"HM","20170310",39000,"20170918","카고 셔츠 / 73 다크 블루","가디건 & 풀오버","73 다크 블루","ALL","XS",
-						"코튼",imgUrl,crawlUrl,"N",(float) 0.1);
-
-				products.add(pm);
-			}
-
-			if(productId.getProductId()[z].equals("73350"))
-			{
-				imgUrl = hostUrl + "/ZARA/6895_066_카키.jpg";
-				crawlUrl = "https://www.zara.com/kr/ko/woman/%EC%95%84%EC%9A%B0%ED%84%B0/%ED%8C%8C%EC%B9%B4/%EC%9E%90%EC%88%98-%EC%98%A4%EB%B2%84%EC%85%94%EC%B8%A0-c710516p4378515.html";
-				pm = new Product(73350,"6895/066",32,"ZARA","20170427",99000,"20170619","자수 오버셔츠 / 카키","블레이저","카키","ALL","S (KR 55)",
-						"면",imgUrl,crawlUrl,"N",(float) 0.5);
-
-				products.add(pm);
-			}
-
-			if(productId.getProductId()[z].equals("52505"))
-			{
-				imgUrl = hostUrl + "/MIXXO/1702144672_49.jpg";
-				crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1702144672";
-				pm = new Product(52505,"1702144672",14,"MIXXO","20170306",89900,"20170825","플라워 자수 야상점퍼 MIWJJ7321S / (49)KHAKI","Outer","KHAKI","ALL","M",
-						"면",imgUrl,crawlUrl,"N",(float) 0.1);
-
-				products.add(pm);
-			}
-
-			if(productId.getProductId()[z].equals("65083"))
-			{
-				imgUrl = hostUrl + "/HM/0446836_09.jpeg";
-				crawlUrl = "http://www2.hm.com/ko_kr/productpage.0446836008.html";
-				pm = new Product(65083,"0446836",0,"HM","20170310",29000,"20170717","크롭트 플란넬 셔츠 / 09 블랙","가디건 & 풀오버","09 블랙","ALL","32",
-						"코튼",imgUrl,crawlUrl,"N",(float) 0.6);
-
-				products.add(pm);
-			}
-
-			if(productId.getProductId()[z].equals("64759"))
-			{
-				imgUrl = hostUrl + "/HM/0485808_19.jpeg";
-				crawlUrl = "http://www2.hm.com/ko_kr/productpage.0485808001.html";
-				pm = new Product(64759,"0485808",0,"HM","20170310",59000,"20170619","유틸리티 재킷 / 19 카키 그린","베이직","19 카키 그린","ALL","32",
-						"코튼",imgUrl,crawlUrl,"N",(float) 0.4);
-
-				products.add(pm);
-			}
-
-			if(productId.getProductId()[z].equals("53356"))
-			{
-				imgUrl = hostUrl + "/MIXXO/1609022962_49.jpg";
-				crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609022962";
-				pm = new Product(53356,"1609022962",-4,"MIXXO","20170306",79900,"20170318","레터링패치 카키셔츠 / (49)KHAKI","Blouse/Shirts","KHAKI","ALL","100",
-						"면",imgUrl,crawlUrl,"N",(float) 0.1);
-
-				products.add(pm);
-			}
-
-			if(productId.getProductId()[z].equals("64768"))
-			{
-				imgUrl = hostUrl + "/HM/0510959_99.jpeg";
-				crawlUrl = "http://www2.hm.com/ko_kr/productpage.0510959003.html";
-				pm = new Product(64768,"0510959",0,"HM","20170310",59000,"20170918","유틸리티 후드 재킷 / 99 다크 카키 그린","베이직","99 다크 카키 그린","ALL","32",
-						"코튼",imgUrl,crawlUrl,"N",(float) 0.3);
-
-				products.add(pm);
-			}
-
-			if(productId.getProductId()[z].equals("28925"))
-			{
-				imgUrl = hostUrl + "/ZARA/6985_401_카키.jpg";
-				crawlUrl = "https://www.zara.com/kr/ko/man/%EC%9E%90%EC%BC%93/%EB%A1%B1-%EC%BD%94%ED%8A%BC-%ED%8C%8C%EC%B9%B4-c586542p4081997.html";
-				pm = new Product(28925,"6985/401",65,"ZARA","20170213",159000,"20170330","롱 코튼 파카 / 카키","봄버자켓","카키","ALL","L (KR 100~105)",
-						"면",imgUrl,crawlUrl,"N",(float) 0.4);
-
-				products.add(pm);
-			}
-			if(productId.getProductId()[z].equals("1144428"))
-			{
-				imgUrl = hostUrl + "/ZARA/6985_401_카키.jpg";
-				crawlUrl = "http://www.lotte.com/goods/viewGoodsDetail.lotte?goods_no=451427774";
-				pm = new Product(1144428,"451427774",65,"LOTTE","20170213",159000,"20170330","롱 코튼 파카 / 카키","봄버자켓","카키","ALL","L (KR 100~105)",
-						"면",imgUrl,crawlUrl,"N",(float) 0.4);
-
-				products.add(pm);
-			}
+//			if(productId.getProductId()[z].equals("52540"))
+//			{
+//				imgUrl = hostUrl + "/MIXXO/1609038732_49.jpg";
+//				crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609038732";
+//				pm = new Product(52540,"1609038732",8,"MIXXO","20170306",79900,"20170318","하프 패치 야상점퍼 / (49)KHAKI","Outer","KHAKI","ALL","100",
+//						"면",imgUrl,crawlUrl,"N",(float) 0.9);
+//
+//				products.add(pm);
+//			}
+//
+//			if(productId.getProductId()[z].equals("66918"))
+//			{
+//				imgUrl = hostUrl + "/HM/0379457_73.jpeg";
+//				crawlUrl = "http://www2.hm.com/ko_kr/productpage.0379457007.html";
+//				pm = new Product(66918,"0379457",0,"HM","20170310",39000,"20170918","카고 셔츠 / 73 다크 블루","가디건 & 풀오버","73 다크 블루","ALL","XS",
+//						"코튼",imgUrl,crawlUrl,"N",(float) 0.1);
+//
+//				products.add(pm);
+//			}
+//
+//			if(productId.getProductId()[z].equals("73350"))
+//			{
+//				imgUrl = hostUrl + "/ZARA/6895_066_카키.jpg";
+//				crawlUrl = "https://www.zara.com/kr/ko/woman/%EC%95%84%EC%9A%B0%ED%84%B0/%ED%8C%8C%EC%B9%B4/%EC%9E%90%EC%88%98-%EC%98%A4%EB%B2%84%EC%85%94%EC%B8%A0-c710516p4378515.html";
+//				pm = new Product(73350,"6895/066",32,"ZARA","20170427",99000,"20170619","자수 오버셔츠 / 카키","블레이저","카키","ALL","S (KR 55)",
+//						"면",imgUrl,crawlUrl,"N",(float) 0.5);
+//
+//				products.add(pm);
+//			}
+//
+//			if(productId.getProductId()[z].equals("52505"))
+//			{
+//				imgUrl = hostUrl + "/MIXXO/1702144672_49.jpg";
+//				crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1702144672";
+//				pm = new Product(52505,"1702144672",14,"MIXXO","20170306",89900,"20170825","플라워 자수 야상점퍼 MIWJJ7321S / (49)KHAKI","Outer","KHAKI","ALL","M",
+//						"면",imgUrl,crawlUrl,"N",(float) 0.1);
+//
+//				products.add(pm);
+//			}
+//
+//			if(productId.getProductId()[z].equals("65083"))
+//			{
+//				imgUrl = hostUrl + "/HM/0446836_09.jpeg";
+//				crawlUrl = "http://www2.hm.com/ko_kr/productpage.0446836008.html";
+//				pm = new Product(65083,"0446836",0,"HM","20170310",29000,"20170717","크롭트 플란넬 셔츠 / 09 블랙","가디건 & 풀오버","09 블랙","ALL","32",
+//						"코튼",imgUrl,crawlUrl,"N",(float) 0.6);
+//
+//				products.add(pm);
+//			}
+//
+//			if(productId.getProductId()[z].equals("64759"))
+//			{
+//				imgUrl = hostUrl + "/HM/0485808_19.jpeg";
+//				crawlUrl = "http://www2.hm.com/ko_kr/productpage.0485808001.html";
+//				pm = new Product(64759,"0485808",0,"HM","20170310",59000,"20170619","유틸리티 재킷 / 19 카키 그린","베이직","19 카키 그린","ALL","32",
+//						"코튼",imgUrl,crawlUrl,"N",(float) 0.4);
+//
+//				products.add(pm);
+//			}
+//
+//			if(productId.getProductId()[z].equals("53356"))
+//			{
+//				imgUrl = hostUrl + "/MIXXO/1609022962_49.jpg";
+//				crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609022962";
+//				pm = new Product(53356,"1609022962",-4,"MIXXO","20170306",79900,"20170318","레터링패치 카키셔츠 / (49)KHAKI","Blouse/Shirts","KHAKI","ALL","100",
+//						"면",imgUrl,crawlUrl,"N",(float) 0.1);
+//
+//				products.add(pm);
+//			}
+//
+//			if(productId.getProductId()[z].equals("64768"))
+//			{
+//				imgUrl = hostUrl + "/HM/0510959_99.jpeg";
+//				crawlUrl = "http://www2.hm.com/ko_kr/productpage.0510959003.html";
+//				pm = new Product(64768,"0510959",0,"HM","20170310",59000,"20170918","유틸리티 후드 재킷 / 99 다크 카키 그린","베이직","99 다크 카키 그린","ALL","32",
+//						"코튼",imgUrl,crawlUrl,"N",(float) 0.3);
+//
+//				products.add(pm);
+//			}
+//
+//			if(productId.getProductId()[z].equals("28925"))
+//			{
+//				imgUrl = hostUrl + "/ZARA/6985_401_카키.jpg";
+//				crawlUrl = "https://www.zara.com/kr/ko/man/%EC%9E%90%EC%BC%93/%EB%A1%B1-%EC%BD%94%ED%8A%BC-%ED%8C%8C%EC%B9%B4-c586542p4081997.html";
+//				pm = new Product(28925,"6985/401",65,"ZARA","20170213",159000,"20170330","롱 코튼 파카 / 카키","봄버자켓","카키","ALL","L (KR 100~105)",
+//						"면",imgUrl,crawlUrl,"N",(float) 0.4);
+//
+//				products.add(pm);
+//			}
+//			if(productId.getProductId()[z].equals("1144428"))
+//			{
+//				imgUrl = hostUrl + "/ZARA/6985_401_카키.jpg";
+//				crawlUrl = "http://www.lotte.com/goods/viewGoodsDetail.lotte?goods_no=451427774";
+//				pm = new Product(1144428,"451427774",65,"LOTTE","20170213",159000,"20170330","롱 코튼 파카 / 카키","봄버자켓","카키","ALL","L (KR 100~105)",
+//						"면",imgUrl,crawlUrl,"N",(float) 0.4);
+//
+//				products.add(pm);
+//			}
 
 		}
 
@@ -1185,68 +1026,68 @@ public class RestApiController {
 		List<Product> products = new ArrayList<Product>();
 		Product pm;
 
-		imgUrl = hostUrl + "/MIXXO/1609038732_49.jpg";
-		crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609038732";
-		pm = new Product(52540,"1609038732",8,"MIXXO","20170306",79900,"20170318","하프 패치 야상점퍼 / (49)KHAKI","Outer","KHAKI","ALL","100",
-				"면",imgUrl,crawlUrl,"N",(float) 0.9);
+//		imgUrl = hostUrl + "/MIXXO/1609038732_49.jpg";
+//		crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609038732";
+//		pm = new Product(52540,"1609038732",8,"MIXXO","20170306",79900,"20170318","하프 패치 야상점퍼 / (49)KHAKI","Outer","KHAKI","ALL","100",
+//				"면",imgUrl,crawlUrl,"N",(float) 0.9);
+//
+//		products.add(pm);
+//
+//		imgUrl = hostUrl + "/HM/0379457_73.jpeg";
+//		crawlUrl = "http://www2.hm.com/ko_kr/productpage.0379457007.html";
+//		pm = new Product(66918,"0379457",0,"HM","20170310",39000,"20170918","카고 셔츠 / 73 다크 블루","가디건 & 풀오버","73 다크 블루","ALL","XS",
+//				"코튼",imgUrl,crawlUrl,"N",(float) 0.1);
+//
+//		products.add(pm);
+//
+//		imgUrl = hostUrl + "/ZARA/6895_066_카키.jpg";
+//		crawlUrl = "https://www.zara.com/kr/ko/woman/%EC%95%84%EC%9A%B0%ED%84%B0/%ED%8C%8C%EC%B9%B4/%EC%9E%90%EC%88%98-%EC%98%A4%EB%B2%84%EC%85%94%EC%B8%A0-c710516p4378515.html";
+//		pm = new Product(73350,"6895/066",32,"ZARA","20170427",99000,"20170619","자수 오버셔츠 / 카키","블레이저","카키","ALL","S (KR 55)",
+//				"면",imgUrl,crawlUrl,"N",(float) 0.5);
+//
+//		products.add(pm);
+//
+//		imgUrl = hostUrl + "/MIXXO/1702144672_49.jpg";
+//		crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1702144672";
+//		pm = new Product(52505,"1702144672",14,"MIXXO","20170306",89900,"20170825","플라워 자수 야상점퍼 MIWJJ7321S / (49)KHAKI","Outer","KHAKI","ALL","M",
+//				"면",imgUrl,crawlUrl,"N",(float) 0.1);
+//
+//		products.add(pm);
+//
+//		imgUrl = hostUrl + "/HM/0446836_09.jpeg";
+//		crawlUrl = "http://www2.hm.com/ko_kr/productpage.0446836008.html";
+//		pm = new Product(65083,"0446836",0,"HM","20170310",29000,"20170717","크롭트 플란넬 셔츠 / 09 블랙","가디건 & 풀오버","09 블랙","ALL","32",
+//				"코튼",imgUrl,crawlUrl,"N",(float) 0.6);
+//
+//		products.add(pm);
+//
+//		imgUrl = hostUrl + "/HM/0485808_19.jpeg";
+//		crawlUrl = "http://www2.hm.com/ko_kr/productpage.0485808001.html";
+//		pm = new Product(64759,"0485808",0,"HM","20170310",59000,"20170619","유틸리티 재킷 / 19 카키 그린","베이직","19 카키 그린","ALL","32",
+//				"코튼",imgUrl,crawlUrl,"N",(float) 0.4);
+//
+//		products.add(pm);
+//
+//		imgUrl = hostUrl + "/MIXXO/1609022962_49.jpg";
+//		crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609022962";
+//		pm = new Product(53356,"1609022962",-4,"MIXXO","20170306",79900,"20170318","레터링패치 카키셔츠 / (49)KHAKI","Blouse/Shirts","KHAKI","ALL","100",
+//				"면",imgUrl,crawlUrl,"N",(float) 0.1);
+//
+//		products.add(pm);
+//
+//		imgUrl = hostUrl + "/HM/0510959_99.jpeg";
+//		crawlUrl = "http://www2.hm.com/ko_kr/productpage.0510959003.html";
+//		pm = new Product(64768,"0510959",0,"HM","20170310",59000,"20170918","유틸리티 후드 재킷 / 99 다크 카키 그린","베이직","99 다크 카키 그린","ALL","32",
+//				"코튼",imgUrl,crawlUrl,"N",(float) 0.3);
+//
+//		products.add(pm);
+//
+//		imgUrl = hostUrl + "/ZARA/6985_401_카키.jpg";
+//		crawlUrl = "https://www.zara.com/kr/ko/man/%EC%9E%90%EC%BC%93/%EB%A1%B1-%EC%BD%94%ED%8A%BC-%ED%8C%8C%EC%B9%B4-c586542p4081997.html";
+//		pm = new Product(28925,"6985/401",65,"ZARA","20170213",159000,"20170330","롱 코튼 파카 / 카키","봄버자켓","카키","ALL","L (KR 100~105)",
+//				"면",imgUrl,crawlUrl,"N",(float) 0.4);
 
-		products.add(pm);
-
-		imgUrl = hostUrl + "/HM/0379457_73.jpeg";
-		crawlUrl = "http://www2.hm.com/ko_kr/productpage.0379457007.html";
-		pm = new Product(66918,"0379457",0,"HM","20170310",39000,"20170918","카고 셔츠 / 73 다크 블루","가디건 & 풀오버","73 다크 블루","ALL","XS",
-				"코튼",imgUrl,crawlUrl,"N",(float) 0.1);
-
-		products.add(pm);
-
-		imgUrl = hostUrl + "/ZARA/6895_066_카키.jpg";
-		crawlUrl = "https://www.zara.com/kr/ko/woman/%EC%95%84%EC%9A%B0%ED%84%B0/%ED%8C%8C%EC%B9%B4/%EC%9E%90%EC%88%98-%EC%98%A4%EB%B2%84%EC%85%94%EC%B8%A0-c710516p4378515.html";
-		pm = new Product(73350,"6895/066",32,"ZARA","20170427",99000,"20170619","자수 오버셔츠 / 카키","블레이저","카키","ALL","S (KR 55)",
-				"면",imgUrl,crawlUrl,"N",(float) 0.5);
-
-		products.add(pm);
-
-		imgUrl = hostUrl + "/MIXXO/1702144672_49.jpg";
-		crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1702144672";
-		pm = new Product(52505,"1702144672",14,"MIXXO","20170306",89900,"20170825","플라워 자수 야상점퍼 MIWJJ7321S / (49)KHAKI","Outer","KHAKI","ALL","M",
-				"면",imgUrl,crawlUrl,"N",(float) 0.1);
-
-		products.add(pm);
-
-		imgUrl = hostUrl + "/HM/0446836_09.jpeg";
-		crawlUrl = "http://www2.hm.com/ko_kr/productpage.0446836008.html";
-		pm = new Product(65083,"0446836",0,"HM","20170310",29000,"20170717","크롭트 플란넬 셔츠 / 09 블랙","가디건 & 풀오버","09 블랙","ALL","32",
-				"코튼",imgUrl,crawlUrl,"N",(float) 0.6);
-
-		products.add(pm);
-
-		imgUrl = hostUrl + "/HM/0485808_19.jpeg";
-		crawlUrl = "http://www2.hm.com/ko_kr/productpage.0485808001.html";
-		pm = new Product(64759,"0485808",0,"HM","20170310",59000,"20170619","유틸리티 재킷 / 19 카키 그린","베이직","19 카키 그린","ALL","32",
-				"코튼",imgUrl,crawlUrl,"N",(float) 0.4);
-
-		products.add(pm);
-
-		imgUrl = hostUrl + "/MIXXO/1609022962_49.jpg";
-		crawlUrl = "http://mixxo.elandmall.com/goods/initGoodsDetail.action?goods_no=1609022962";
-		pm = new Product(53356,"1609022962",-4,"MIXXO","20170306",79900,"20170318","레터링패치 카키셔츠 / (49)KHAKI","Blouse/Shirts","KHAKI","ALL","100",
-				"면",imgUrl,crawlUrl,"N",(float) 0.1);
-
-		products.add(pm);
-
-		imgUrl = hostUrl + "/HM/0510959_99.jpeg";
-		crawlUrl = "http://www2.hm.com/ko_kr/productpage.0510959003.html";
-		pm = new Product(64768,"0510959",0,"HM","20170310",59000,"20170918","유틸리티 후드 재킷 / 99 다크 카키 그린","베이직","99 다크 카키 그린","ALL","32",
-				"코튼",imgUrl,crawlUrl,"N",(float) 0.3);
-
-		products.add(pm);
-
-		imgUrl = hostUrl + "/ZARA/6985_401_카키.jpg";
-		crawlUrl = "https://www.zara.com/kr/ko/man/%EC%9E%90%EC%BC%93/%EB%A1%B1-%EC%BD%94%ED%8A%BC-%ED%8C%8C%EC%B9%B4-c586542p4081997.html";
-		pm = new Product(28925,"6985/401",65,"ZARA","20170213",159000,"20170330","롱 코튼 파카 / 카키","봄버자켓","카키","ALL","L (KR 100~105)",
-				"면",imgUrl,crawlUrl,"N",(float) 0.4);
-
-		products.add(pm);
+//		products.add(pm);
 
 		return products;
 	}

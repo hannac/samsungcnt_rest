@@ -26,19 +26,19 @@ public class DbTestController {
 	@Autowired
 	private SqlSessionFactory factory;
 	
-	@GetMapping(value = "/countAll")
-	public Integer countAll() {
-		logger.debug("-------------------------------------------------------------");
-		logger.debug("mapper:" + mapper);
-		logger.debug("-------------------------------------------------------------");
-		
-		System.out.println("-------------------------------------------------------------");
-		System.out.println("ds:" + ds);
-		System.out.println("factory:" + factory);
-		System.out.println("mapper:" + mapper);
-		System.out.println("-------------------------------------------------------------");
-		
-		return mapper.selectCount(); 
-	}
+//	@GetMapping(value = "/countAll")
+//	public Integer countAll() {
+//		logger.debug("-------------------------------------------------------------");
+//		logger.debug("mapper:" + mapper);
+//		logger.debug("-------------------------------------------------------------");
+//
+//		System.out.println("-------------------------------------------------------------");
+//		System.out.println("ds:" + ds);
+//		System.out.println("factory:" + factory);
+//		System.out.println("mapper:" + mapper);
+//		System.out.println("-------------------------------------------------------------");
+//
+//		return mapper.selectCount();
+//	}
 	
 }
