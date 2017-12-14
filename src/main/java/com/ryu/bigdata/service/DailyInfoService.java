@@ -1,5 +1,13 @@
 package com.ryu.bigdata.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ryu.bigdata.dto.models.DailyInfo;
 import com.ryu.bigdata.dto.models.DailyRate;
 import com.ryu.bigdata.dto.models.DailySearch;
@@ -7,12 +15,6 @@ import com.ryu.bigdata.dto.models.GoodsEval;
 import com.ryu.bigdata.dto.requestDto.DailyRequestDto;
 import com.ryu.bigdata.dto.responseDto.CommonResult;
 import com.ryu.bigdata.mapper.DailyMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class DailyInfoService {
@@ -50,5 +52,28 @@ public class DailyInfoService {
 
         }
         return resultMap;
+    }
+    
+    /**
+     * 무신사, 네이버 (외부 사이트) 인기 검색어만 입력 
+     * @param dailyRequestDto
+     * @return
+     */
+    @Transactional
+    public Map<String, Object> insertDailyInfoOuterSite(List<DailySearch> searchList) {
+    	Map<String, Object> resultMap = new HashMap<>();
+    	try {
+    		// 일일인기검색어
+    		for(DailySearch item : searchList) {
+    			dailyMapper.insertDailySearchOuter(item);
+    		}
+    		resultMap.put("result", new CommonResult());
+    		
+    	} catch (Exception e) {
+    		
+    	} finally {
+    		
+    	}
+    	return resultMap;
     }
 }

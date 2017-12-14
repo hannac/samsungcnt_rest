@@ -1,14 +1,34 @@
 package com.ryu.bigdata.controller;
 
+import java.io.IOException;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ryu.bigdata.dto.models.DailySearch;
 import com.ryu.bigdata.dto.requestDto.DailyRequestDto;
 import com.ryu.bigdata.dto.requestDto.SkuRequestDto;
 import com.ryu.bigdata.dto.requestDto.VectorConvertitsRequestDto;
 import com.ryu.bigdata.dto.requestDto.VectorUpsertRequestDto;
-import com.ryu.bigdata.dto.responseDto.CommonResult;
-import com.ryu.bigdata.dto.responseDto.VectorConvertitsResponseDto;
 import com.ryu.bigdata.exception.NoContentException;
 import com.ryu.bigdata.mapper.ProductMapper;
 import com.ryu.bigdata.mapper.VectorMapper;
@@ -16,23 +36,23 @@ import com.ryu.bigdata.server.ImgSearchServer;
 import com.ryu.bigdata.service.DailyInfoService;
 import com.ryu.bigdata.service.SkuService;
 import com.ryu.bigdata.service.VectorService;
-import com.ryu.bigdata.vo.*;
+import com.ryu.bigdata.vo.CompetitionInfoSelet;
+import com.ryu.bigdata.vo.ImageInfo;
+import com.ryu.bigdata.vo.ImageInfoUrl;
+import com.ryu.bigdata.vo.ImageInfoUrlDetail;
+import com.ryu.bigdata.vo.Product;
+import com.ryu.bigdata.vo.ProductIds;
+import com.ryu.bigdata.vo.ProductWeekly;
+import com.ryu.bigdata.vo.ProductWeeklyVoc;
+import com.ryu.bigdata.vo.Result;
+import com.ryu.bigdata.vo.Search;
+import com.ryu.bigdata.vo.SimpleImage;
+import com.ryu.bigdata.vo.Voc;
+import com.ryu.bigdata.vo.WeeklySales;
+import com.ryu.bigdata.vo.WeeklySalesSearch;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.junit.runners.Parameterized;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 public class RestApiController {
@@ -1202,6 +1222,12 @@ public class RestApiController {
 	@PostMapping("/v1/dailySearchRate")
 	public Map dailyInsert(@RequestBody DailyRequestDto dailyRequestDto) {
 		return dailyInfoService.insertDailyInfo(dailyRequestDto);
+	}
+	
+	@ApiOperation(value = "타사 일간 검색어 랭킹 입력")
+	@PostMapping("/v1/dailyOuterSites")
+	public Map insertDailyInfoOuterSite(@RequestBody List<DailySearch> searchList) {
+		return dailyInfoService.insertDailyInfoOuterSite(searchList);
 	}
 
 

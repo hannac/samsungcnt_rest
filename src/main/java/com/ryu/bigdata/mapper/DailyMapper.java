@@ -17,6 +17,8 @@ public interface DailyMapper {
 
 	int insertDailySearch(DailySearch dailySearch);
 
+	int insertDailySearchOuter(DailySearch dailySearch);
+	
 	int insertDailyRate(DailyRate dailyRate);
 
 	int insertGoosEval(GoodsEval goodsEval);

@@ -48,6 +48,28 @@
             , 'REST_API_ADMIN'
         )
     </insert>
+    <insert id="insertDailySearchOuter" parameterType="com.ryu.bigdata.dto.models.DailySearch">
+        INSERT INTO bigdata.DAILY_POP_SEARCH_WORD
+        (
+              SITE_CODE
+            , DATE
+            , SEARCH_WORD
+            , RANK
+            , SEARCH_COUNT
+            , REG_DATE_TIME
+            , REG_USER
+        )
+        VALUES
+        (
+              #{retailerCode}
+            , date_format(#{day}, '%y-%m-%d')
+            , #{searchWord}
+            , #{rank}
+            , #{searchCnt}
+            , now()
+            , 'REST_API_ADMIN'
+        )
+    </insert>
     <insert id="insertDailyRate" parameterType="com.ryu.bigdata.dto.models.DailyRate">
         INSERT INTO bigdata.DAILY_GOODS_RESP_RATE
         (

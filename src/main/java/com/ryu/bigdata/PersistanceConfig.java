@@ -1,5 +1,9 @@
 package com.ryu.bigdata;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.security.GeneralSecurityException;
+
 import javax.sql.DataSource;
 
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -14,7 +18,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.ParseException;
 
 @Configuration
 @MapperScan(value="com.ryu.bigdata.mapper", sqlSessionFactoryRef="sqlSessionFactory")
@@ -53,4 +61,11 @@ public class PersistanceConfig {
 	public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory factory) throws Exception {
 		return new SqlSessionTemplate(factory);
 	}
+	
+	@Bean
+    public PlatformTransactionManager transactionManager() throws URISyntaxException, GeneralSecurityException, ParseException, IOException {
+        return new DataSourceTransactionManager(dataSource());
+    }
+	
+	
 }
